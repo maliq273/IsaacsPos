@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>IsaacsPOS Cart</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(120deg, #a8e063, #56ab2f);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    .product {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 10px;
+      margin: 10px auto;
+      max-width: 400px;
+      transition: transform 0.2s ease-in-out;
+    }
+    .product:hover {
+      transform: scale(1.03);
+    }
+    button {
+      background: #fff;
+      color: #2d572c;
+      border: none;
+      padding: 8px 14px;
+      margin-top: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #e3ffe1;
+    }
+    #cart {
+      margin-top: 20px;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛒 Your Cart</h1>
+  <div id="products"></div>
+  
+  <div id="cart">
+    <h2>Cart Summary</h2>
+    <ul id="cart-items"></ul>
+    <p id="total">Total: R0.00</p>
+    <button onclick="checkout()">Checkout</button>
+  </div>
+
+  <script>
+    let cart = [];
+    let products = [];
+
+    async function loadInventory() {
+      const res = await fetch("https://raw.githubusercontent.com/maliq273/IsaacsPos/main/inventory.json");
+      const data = await res.json();
+      products = data.inventory;
+      displayProducts();
+    }
+
+    function displayProducts() {
+      const container = document.getElementById("products");
+      container.innerHTML = "";
+      products.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+          <h3>${p.name}</h3>
+          <p>Price: R${p.price.toFixed(2)}</p>
+          <p>Stock: ${p.stock}</p>
+          <button onclick="addToCart(${p.id})">Add to Cart</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addToCart(id) {
+      const product = products.find(p => p.id === id);
+      cart.push(product);
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartList = document.getElementById("cart-items");
+      cartList.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - R${item.price.toFixed(2)}`;
+        cartList.appendChild(li);
+        total += item.price;
+      });
+      document.getElementById("total").innerText = `Total: R${total.toFixed(2)}`;
+    }
+
+    function checkout() {
+      const presale = {
+        id: Date.now(),
+        items: cart,
+        total: cart.reduce((sum, i) => sum + i.price, 0)
+      };
+
+      alert("✅ Cart submitted! Your presale ID: " + presale.id);
+
+      // TODO: Push presale.json to GitHub via Hub relay
+      console.log("Presale", presale);
+    }
+
+    loadInventory();
+  </script>
+</body>
+</html>
