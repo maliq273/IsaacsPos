@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IsaacsPOS Login</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <h1>Welcome to IsaacsPOS</h1>
+  <p>Scan the QR code at the cashier to log in.</p>
+
+  <div id="qrcode"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script>
+    // This URL is where the customer will log in
+    const loginUrl = "https://maliq273.github.io/IsaacsPOS_Hub/login.html";
+
+    // Generate QR code
+    QRCode.toCanvas(document.getElementById('qrcode'), loginUrl, { width: 200 }, function (error) {
+      if (error) console.error(error);
+    });
+  </script>
+</body>
+</html>
