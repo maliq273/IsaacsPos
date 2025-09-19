@@ -1,0 +1,22 @@
+{
+  "inventory": [
+    {
+      "id": 101,
+      "name": "Shampoo 250ml",
+      "price": 55.00,
+      "stock": 20
+    },
+    {
+      "id": 102,
+      "name": "Conditioner 250ml",
+      "price": 65.00,
+      "stock": 15
+    },
+    {
+      "id": 103,
+      "name": "Hair Dryer",
+      "price": 450.00,
+      "stock": 5
+    }
+  ]
+}
