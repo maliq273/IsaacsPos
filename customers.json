@@ -1,0 +1,22 @@
+{
+  "customers": [
+    {
+      "id": 1,
+      "store": "Isaacs Hair & Beauty",
+      "name": "John",
+      "surname": "Doe",
+      "phone": "0821234567",
+      "birthday": "1990-05-22",
+      "password": "hashed_password_here"
+    },
+    {
+      "id": 2,
+      "store": "Isaacs Coffee Bar",
+      "name": "Mary",
+      "surname": "Smith",
+      "phone": "0839876543",
+      "birthday": "1988-09-15",
+      "password": "hashed_password_here"
+    }
+  ]
+}
