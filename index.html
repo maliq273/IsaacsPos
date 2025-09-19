@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IsaacsPOS Customer Portal</title>
   <style>
-    /* Nature inspired theme */
+    /* Nature inspired background */
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -13,15 +13,38 @@
       color: #2f4f2f;
       overflow-x: hidden;
     }
+    .splash {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to bottom, #a8e6cf, #d4f5d0);
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 2s ease;
+    }
+    .splash h1 {
+      font-size: 34px;
+      color: #1b5e20;
+      animation: fadeInText 3s ease;
+    }
+    @keyframes fadeInText {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
     .container {
       max-width: 400px;
       margin: 5% auto;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       border-radius: 20px;
       padding: 30px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.2);
       animation: fadeIn 2s ease;
       text-align: center;
+      display: none; /* hidden until splash fades */
     }
     h1 {
       margin-bottom: 10px;
@@ -102,7 +125,7 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* Subtle floating leaf animation */
+    /* Floating leaves */
     .leaf {
       position: absolute;
       width: 40px;
@@ -118,14 +141,19 @@
   </style>
 </head>
 <body>
+  <!-- Splash Screen -->
+  <div class="splash" id="splash">
+    <h1 id="splash-text">🌱 Welcome to IsaacsPOS</h1>
+  </div>
+
   <!-- Floating leaves -->
   <div class="leaf" style="left:10%; animation-delay:0s;"></div>
   <div class="leaf" style="left:40%; animation-delay:4s;"></div>
   <div class="leaf" style="left:70%; animation-delay:8s;"></div>
 
-  <div class="container">
-    <h1>Welcome to IsaacsPOS</h1>
-    <p id="store-name">Loading store...</p>
+  <div class="container" id="main-content">
+    <h1 id="welcome-text">Welcome to IsaacsPOS</h1>
+    <p id="store-name">Loading store information...</p>
 
     <!-- Tabs -->
     <div class="tabs">
@@ -136,8 +164,8 @@
     <!-- Login -->
     <div id="login" class="tab-content active">
       <form id="loginForm">
-        <input type="text" id="loginName" placeholder="Your Name" required>
-        <input type="tel" id="loginPhone" placeholder="Phone Number" required>
+        <input type="text" id="loginUser" placeholder="Name or Phone" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
         <button type="submit">Login</button>
       </form>
     </div>
@@ -149,6 +177,7 @@
         <input type="text" id="signupSurname" placeholder="Surname" required>
         <input type="tel" id="signupPhone" placeholder="Phone Number" required>
         <input type="date" id="signupBirthday" required>
+        <input type="password" id="signupPassword" placeholder="Create Password" required>
         <button type="submit">Sign Up</button>
       </form>
     </div>
@@ -158,6 +187,7 @@
   </div>
 
   <script>
+    // Tab switch
     function openTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
@@ -165,36 +195,51 @@
       document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
     }
 
+    // Store Info
     async function loadStore() {
       const storeLabel = document.getElementById("store-name");
+      const welcomeText = document.getElementById("welcome-text");
+      const splashText = document.getElementById("splash-text");
       try {
         const resp = await fetch("https://raw.githubusercontent.com/maliq273/IsaacsPOS_Hub/main/company_info.json");
         const data = await resp.json();
         storeLabel.textContent = `You are visiting: ${data.name}`;
+        welcomeText.textContent = `🌱 Welcome to ${data.name}`;
+        splashText.textContent = `🌱 Welcome to ${data.name}`;
       } catch {
         storeLabel.textContent = "Welcome! (Store info not available)";
+        welcomeText.textContent = "🌱 Welcome to IsaacsPOS";
       }
     }
     loadStore();
 
+    // Hide splash after delay
+    setTimeout(() => {
+      document.getElementById("splash").style.opacity = 0;
+      setTimeout(() => {
+        document.getElementById("splash").style.display = "none";
+        document.getElementById("main-content").style.display = "block";
+      }, 2000);
+    }, 2500);
+
+    // Forms
     document.getElementById("loginForm").addEventListener("submit", e => {
       e.preventDefault();
-      const name = document.getElementById("loginName").value.trim();
-      const phone = document.getElementById("loginPhone").value.trim();
-      document.getElementById("message").textContent = `Welcome back, ${name}!`;
+      const user = document.getElementById("loginUser").value.trim();
+      document.getElementById("message").textContent = `Welcome back, ${user}!`;
     });
 
     document.getElementById("signupForm").addEventListener("submit", e => {
       e.preventDefault();
       const name = document.getElementById("signupName").value.trim();
       const surname = document.getElementById("signupSurname").value.trim();
-      const phone = document.getElementById("signupPhone").value.trim();
-      const birthday = document.getElementById("signupBirthday").value;
       document.getElementById("message").textContent = `Thanks for signing up, ${name} ${surname}!`;
     });
   </script>
 </body>
 </html>
+
+
 
 
 
