@@ -1,26 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>IsaacsPOS Login</title>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>Welcome to IsaacsPOS</title>
   <link rel="stylesheet" href="https://raw.githubusercontent.com/maliq273/IsaacsPos/refs/heads/main/index.css">
+
+  <style>
+    /* Full-page gradient background */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      overflow: hidden;
+      animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #2a3d2f;
+      margin-bottom: 0.5em;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      animation: fadeInUp 1.5s ease forwards;
+      opacity: 0;
+    }
+
+    p {
+      font-size: 1.2em;
+      color: #3a4f3b;
+      margin-bottom: 2em;
+      animation: fadeInUp 2s ease forwards;
+      opacity: 0;
+    }
+
+    #qrcode {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      animation: popIn 1.5s ease forwards;
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px);}
+      100% { opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.5);}
+      100% { opacity: 1; transform: scale(1);}
+    }
+
+    /* Floating leaves effect */
+    .leaf {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: url('https://raw.githubusercontent.com/maliq273/IsaacsPos/refs/heads/main/leaf.png') no-repeat center center;
+      background-size: contain;
+      animation: floatLeaf linear infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes floatLeaf {
+      0% { transform: translateY(-50px) rotate(0deg); opacity: 0.5; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0.5; }
+    }
+  </style>
 </head>
 <body>
+
   <h1>Welcome to IsaacsPOS</h1>
   <p>Scan the QR code at the cashier to log in.</p>
 
   <div id="qrcode"></div>
 
+  <!-- Floating leaves -->
+  <script>
+    for(let i=0; i<10; i++){
+      let leaf = document.createElement('div');
+      leaf.className = 'leaf';
+      leaf.style.left = Math.random()*100 + 'vw';
+      leaf.style.animationDuration = (5 + Math.random()*10) + 's';
+      leaf.style.animationDelay = Math.random()*5 + 's';
+      document.body.appendChild(leaf);
+    }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
   <script>
-    // This URL is where the customer will log in
     const loginUrl = "https://maliq273.github.io/IsaacsPOS_Hub/login.html";
-
-    // Generate QR code
     QRCode.toCanvas(document.getElementById('qrcode'), loginUrl, { width: 200 }, function (error) {
       if (error) console.error(error);
     });
   </script>
+
 </body>
 </html>
+
+
 
