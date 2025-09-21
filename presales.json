@@ -1,0 +1,15 @@
+{
+  "presales": [
+    {
+      "id": 1001,
+      "customer_id": 1,
+      "company": "IsaacsPOS Demo Store",
+      "cart": [
+        {"id": 1, "name": "Shampoo", "price": 49.99, "qty": 2}
+      ],
+      "total": 99.98,
+      "created_at": "2025-09-20T18:30:00Z",
+      "status": "pending"
+    }
+  ]
+}
