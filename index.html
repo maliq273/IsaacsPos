@@ -7,13 +7,13 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #e8f5e9, #ffffff);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #ffffff);
       height: 100vh;
-      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
 
     /* Splash screen */
@@ -29,7 +29,9 @@
       z-index: 1000;
       transition: opacity 1s ease;
       color: white;
-      font-size: 2rem;
+      font-size: 2.2rem;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
 
     /* Floating leaves */
@@ -51,8 +53,13 @@
     /* Main container */
     .container {
       display: none;
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 30px 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       text-align: center;
-      padding: 20px;
       animation: fadeIn 1s ease forwards;
     }
     @keyframes fadeIn {
@@ -60,45 +67,77 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    h1 {
+      font-size: 1.8rem;
+      color: #2e7d32;
+      margin-bottom: 8px;
+    }
+    #store-name {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
     /* Tabs */
     .tabs {
-      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+      background: #e0f2f1;
+      border-radius: 30px;
+      padding: 5px;
     }
     .tab-button {
-      padding: 10px 20px;
-      margin: 5px;
+      flex: 1;
+      padding: 10px 0;
       border: none;
+      border-radius: 30px;
+      background: transparent;
+      color: #388e3c;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tab-button.active {
       background: #66bb6a;
       color: white;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: background 0.3s;
     }
-    .tab-button.active, .tab-button:hover {
-      background: #388e3c;
-    }
+
     .tab-content {
       display: none;
-      margin-top: 20px;
     }
     .tab-content.active {
       display: block;
     }
 
-    input, button {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      width: 80%;
-      max-width: 300px;
-      border-radius: 6px;
+    /* Forms */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    input {
+      padding: 12px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus {
+      border-color: #66bb6a;
+      box-shadow: 0 0 5px rgba(102, 187, 106, 0.3);
     }
     button {
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
       background: #66bb6a;
       color: white;
-      border: none;
+      font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
+      transition: background 0.3s;
     }
     button:hover {
       background: #388e3c;
@@ -250,6 +289,8 @@
   </script>
 </body>
 </html>
+
+
 
 
 
