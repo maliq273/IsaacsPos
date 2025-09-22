@@ -50,16 +50,16 @@
       letter-spacing: 1px;
     }
 
-    /* Falling leaves */
+    /* Falling leaves with sway */
     .leaf {
       position: fixed;
       top: -50px;
-      width: 25px;
-      height: 25px;
+      width: 30px;
+      height: 30px;
       background-size: contain;
       background-repeat: no-repeat;
       opacity: 0.8;
-      animation: fall 12s linear infinite;
+      animation: fall 12s linear infinite, sway 4s ease-in-out infinite alternate;
     }
     .leaf.autumn { background-image: url('https://i.ibb.co/0Xb3bGn/autumn-leaf.png'); }
     .leaf.green { background-image: url('https://i.ibb.co/1rXYg2M/leaf.png'); }
@@ -67,6 +67,12 @@
     @keyframes fall {
       0% { transform: translateY(-50px) rotate(0deg) scale(1); }
       100% { transform: translateY(110vh) rotate(360deg) scale(1.2); }
+    }
+
+    @keyframes sway {
+      0% { transform: translateX(0px); }
+      50% { transform: translateX(15px); }
+      100% { transform: translateX(0px); }
     }
 
     /* Main container (glass effect) */
@@ -303,6 +309,7 @@
   </script>
 </body>
 </html>
+
 
 
 
