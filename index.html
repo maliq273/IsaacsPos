@@ -2,253 +2,167 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IsaacsPOS Customer Portal</title>
+  <title>Welcome</title>
   <style>
-    body {
+    body, html {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: url("https://i.ibb.co/Fbzc1kJf/vecteezy-japanese-garden-at-famous-kinkakuji-12235571.jpg") no-repeat center center/cover;
-      height: 100vh;
+      padding: 0;
+      height: 100%;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #d9f0e6, #ffffff);
     }
 
     /* Splash screen */
-    .splash {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
+    #splash {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      z-index: 1000;
-      transition: opacity 1.5s ease;
-      color: white;
-      font-size: 2.5rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-      text-align: center;
+      animation: ripple 6s infinite;
+      z-index: 10;
     }
 
-    .splash h1 {
-      margin: 0;
-      padding: 0;
+    #splash h1 {
+      font-size: 3em;
+      color: #333;
+      animation: fadeIn 2s ease-in-out;
     }
 
-    /* Falling leaves */
-    .leaf {
-      position: fixed;
-      top: -50px;
-      width: 50px;
-      height: 50px;
-      background: url('https://i.ibb.co/LXrD5sX3/group-of-leaves-1970804.png') no-repeat center/contain;
-      opacity: 0.9;
-      pointer-events: none;
-    }
-
-    /* Main container */
-    .container {
-      display: none;
-      width: 100%;
-      max-width: 420px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 16px;
-      padding: 30px 25px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      text-align: center;
-      animation: fadeIn 1s ease forwards;
+    @keyframes ripple {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
 
-    h1 {
-      font-size: 1.8rem;
-      color: #2e7d32;
-      margin-bottom: 12px;
-    }
-    #store-name {
-      font-size: 1rem;
-      color: #555;
-      margin-bottom: 20px;
-    }
-
-    /* Tabs */
-    .tabs {
+    /* Login/Signup */
+    #login {
+      display: none;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #ffffff, #f5f5f5);
       display: flex;
       justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1;
+    }
+
+    #login h2 {
+      font-size: 2em;
       margin-bottom: 20px;
-      background: #e0f2f1;
-      border-radius: 30px;
-      padding: 5px;
-    }
-    .tab-button {
-      flex: 1;
-      padding: 10px 0;
-      border: none;
-      border-radius: 30px;
-      background: transparent;
-      color: #388e3c;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .tab-button.active {
-      background: #66bb6a;
-      color: white;
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Forms */
     form {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
-    input {
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      outline: none;
-      transition: border 0.3s;
-    }
-    input:focus {
-      border-color: #66bb6a;
-      box-shadow: 0 0 5px rgba(102, 187, 106, 0.3);
-    }
-    button {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #66bb6a;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover { background: #388e3c; }
 
-    #message {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #388e3c;
+    input {
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 1em;
+      background: #4caf50;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Leaves */
+    .leaf {
+      position: absolute;
+      top: -100px;
+      will-change: transform;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+      }
+    }
+
+    @keyframes sway {
+      0% { transform: translateX(0px); }
+      50% { transform: translateX(20px); }
+      100% { transform: translateX(0px); }
     }
   </style>
 </head>
 <body>
-  <!-- Splash Screen -->
-  <div class="splash" id="splash">
-    <h1>🌱 Welcome to Isaacs and Partners</h1>
-    <p>Loading your experience...</p>
+  <!-- Splash -->
+  <div id="splash">
+    <h1>Welcome to Isaacs and Partners</h1>
   </div>
 
-  <!-- Leaves -->
-  <div class="leaf" style="left:10%;"></div>
-  <div class="leaf" style="left:30%;"></div>
-  <div class="leaf" style="left:50%;"></div>
-  <div class="leaf" style="left:70%;"></div>
-  <div class="leaf" style="left:90%;"></div>
-
-  <!-- Main Content -->
-  <div class="container" id="main-content">
-    <h1 id="welcome-text">🌱 Welcome</h1>
-    <p id="store-name">Loading store information...</p>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-button active" onclick="openTab('login')">Login</button>
-      <button class="tab-button" onclick="openTab('signup')">Sign Up</button>
-    </div>
-
-    <!-- Login -->
-    <div id="login" class="tab-content active">
-      <form id="loginForm">
-        <input type="text" id="loginUser" placeholder="Name or Phone" required>
-        <input type="password" id="loginPassword" placeholder="Password" required>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-
-    <!-- Signup -->
-    <div id="signup" class="tab-content">
-      <form id="signupForm">
-        <input type="text" id="signupName" placeholder="First Name" required>
-        <input type="text" id="signupSurname" placeholder="Surname" required>
-        <input type="tel" id="signupPhone" placeholder="Phone Number" required>
-        <input type="date" id="signupBirthday" required>
-        <input type="password" id="signupPassword" placeholder="Create Password" required>
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
-
-    <!-- Messages -->
-    <div id="message"></div>
+  <!-- Login -->
+  <div id="login">
+    <h2>Welcome to <span id="companyName">Company</span></h2>
+    <form>
+      <input type="text" placeholder="Name or Phone" required>
+      <input type="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <p>Or sign up:</p>
+    <form>
+      <input type="text" placeholder="Name" required>
+      <input type="text" placeholder="Surname" required>
+      <input type="text" placeholder="Phone" required>
+      <input type="date" placeholder="Birthday" required>
+      <input type="password" placeholder="Create Password" required>
+      <button type="submit">Sign Up</button>
+    </form>
   </div>
 
   <script>
-    const REPO = "maliq273/IsaacsPOS_Hub";
-    const CUSTOMERS_FILE = "customers.json";
-    const BRANCH = "main";
-
-    // Tab switch
-    function openTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
-    }
-
-    // Load Store Info
-    async function loadStore() {
-      const storeLabel = document.getElementById("store-name");
-      const welcomeText = document.getElementById("welcome-text");
-      try {
-        const resp = await fetch("https://raw.githubusercontent.com/" + REPO + "/main/company_info.json");
-        const data = await resp.json();
-        storeLabel.textContent = `You are visiting: ${data.name}`;
-        welcomeText.textContent = `🌱 Welcome to ${data.name}`;
-      } catch {
-        storeLabel.textContent = "Welcome! (Store info not available)";
-        welcomeText.textContent = "🌱 Welcome";
-      }
-    }
-    loadStore();
-
-    // Hide splash after delay
+    // Fade splash -> login
     setTimeout(() => {
-      document.getElementById("splash").style.opacity = 0;
-      setTimeout(() => {
-        document.getElementById("splash").style.display = "none";
-        document.getElementById("main-content").style.display = "block";
-      }, 1500);
-    }, 3000);
+      document.getElementById("splash").style.display = "none";
+      document.getElementById("login").style.display = "flex";
+    }, 4000);
 
-    // Random wind sway for leaves
-    document.querySelectorAll(".leaf").forEach((leaf, i) => {
-      leaf.animate([
-        { transform: `translateX(0px) translateY(0px) rotate(0deg)` },
-        { transform: `translateX(${Math.random()*100-50}px) translateY(90vh) rotate(${Math.random()*360}deg)` }
-      ], {
-        duration: 12000 + Math.random()*4000,
-        iterations: Infinity,
-        easing: "ease-in-out",
-        delay: i*2000
-      });
-    });
+    // Dynamic company name (simulated for now)
+    document.getElementById("companyName").textContent = "Isaacs & Partners";
+
+    // Falling leaves generator
+    function createLeaf() {
+      const leaf = document.createElement("img");
+      leaf.src = "https://i.ibb.co/LXrD5sX3/group-of-leaves-1970804.png";
+      leaf.classList.add("leaf");
+      
+      const size = Math.random() * 40 + 20; // 20px - 60px
+      leaf.style.width = size + "px";
+      leaf.style.left = Math.random() * window.innerWidth + "px";
+      leaf.style.animation = `fall ${6 + Math.random() * 6}s linear, sway ${3 + Math.random() * 3}s ease-in-out infinite`;
+
+      document.body.appendChild(leaf);
+
+      setTimeout(() => leaf.remove(), 12000);
+    }
+
+    setInterval(createLeaf, 600);
   </script>
 </body>
 </html>
+
 
 
 
