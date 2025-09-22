@@ -8,28 +8,12 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url("https://i.ibb.co/Fbzc1kJf/vecteezy-japanese-garden-at-famous-kinkakuji-12235571.jpg") no-repeat center center/cover;
       height: 100vh;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      position: relative;
-      background: #e8f5e9;
-    }
-
-    /* Background fade-in */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url("https://i.ibb.co/Fbzc1kJf/vecteezy-japanese-garden-at-famous-kinkakuji-12235571.jpg") center/cover no-repeat;
-      z-index: -3;
-      opacity: 0;
-      animation: fadeInBg 2s forwards;
-    }
-    @keyframes fadeInBg {
-      to { opacity: 1; }
     }
 
     /* Splash screen */
@@ -37,335 +21,46 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: linear-gradient(135deg, #66bb6a, #388e3c);
+      background: rgba(0,0,0,0.6);
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
       z-index: 1000;
-      transition: opacity 1s ease;
+      transition: opacity 1.5s ease;
       color: white;
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       font-weight: bold;
       letter-spacing: 1px;
-    }
-
-    /* Falling leaves with sway */
-    .leaf {
-      position: fixed;
-      top: -50px;
-      width: 30px;
-      height: 30px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      opacity: 0.8;
-      animation: fall 12s linear infinite, sway 4s ease-in-out infinite alternate;
-    }
-    .leaf.autumn { background-image: url('https://i.ibb.co/0Xb3bGn/autumn-leaf.png'); }
-    .leaf.green { background-image: url('https://i.ibb.co/1rXYg2M/leaf.png'); }
-
-    @keyframes fall {
-      0% { transform: translateY(-50px) rotate(0deg) scale(1); }
-      100% { transform: translateY(110vh) rotate(360deg) scale(1.2); }
-    }
-
-    @keyframes sway {
-      0% { transform: translateX(0px); }
-      50% { transform: translateX(15px); }
-      100% { transform: translateX(0px); }
-    }
-
-    /* Main container (glass effect) */
-    .container {
-      display: none;
-      width: 100%;
-      max-width: 420px;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 35px 25px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
       text-align: center;
-      animation: fadeIn 1s ease forwards;
-      position: relative;
-      z-index: 1;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h1 {
-      font-size: 1.9rem;
-      color: #2e7d32;
-      margin-bottom: 8px;
-    }
-    #store-name {
-      font-size: 1rem;
-      color: #444;
-      margin-bottom: 20px;
-    }
-
-    /* Tabs */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-      background: #e0f2f1;
-      border-radius: 30px;
-      padding: 5px;
-    }
-    .tab-button {
-      flex: 1;
-      padding: 10px 0;
-      border: none;
-      border-radius: 30px;
-      background: transparent;
-      color: #388e3c;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .tab-button.active {
-      background: #66bb6a;
-      color: white;
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Forms */
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    input {
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-      outline: none;
-      transition: border 0.3s, box-shadow 0.3s;
-    }
-    input:focus {
-      border-color: #66bb6a;
-      box-shadow: 0 0 6px rgba(102, 187, 106, 0.4);
-    }
-    button {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #66bb6a;
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
-    }
-    button:hover {
-      background: #388e3c;
-      transform: translateY(-2px);
-    }
-
-    #message {
-      margin-top: 15px;
-      font-weight: bold;
-      color: #388e3c;
-    }
-  </style>
-</head>
-<body>
-  <!-- Splash Screen -->
-  <div class="splash" id="splash">
-    <h1 id="splash-text">🌱 Welcome to IsaacsPOS</h1>
-    <p>Loading your experience...</p>
-  </div>
-
-  <!-- Floating leaves -->
-  <div class="leaf green" style="left:10%; animation-delay:0s;"></div>
-  <div class="leaf autumn" style="left:35%; animation-delay:3s; width:30px; height:30px;"></div>
-  <div class="leaf green" style="left:60%; animation-delay:6s; width:28px; height:28px;"></div>
-  <div class="leaf autumn" style="left:80%; animation-delay:9s; width:32px; height:32px;"></div>
-
-  <!-- Main Content -->
-  <div class="container" id="main-content">
-    <h1 id="welcome-text">Welcome to IsaacsPOS</h1>
-    <p id="store-name">Loading store information...</p>
-
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab-button active" onclick="openTab('login')">Login</button>
-      <button class="tab-button" onclick="openTab('signup')">Sign Up</button>
-    </div>
-
-    <!-- Login -->
-    <div id="login" class="tab-content active">
-      <form id="loginForm">
-        <input type="text" id="loginUser" placeholder="Name or Phone" required>
-        <input type="password" id="loginPassword" placeholder="Password" required>
-        <button type="submit">Login</button>
-      </form>
-    </div>
-
-    <!-- Signup -->
-    <div id="signup" class="tab-content">
-      <form id="signupForm">
-        <input type="text" id="signupName" placeholder="First Name" required>
-        <input type="text" id="signupSurname" placeholder="Surname" required>
-        <input type="tel" id="signupPhone" placeholder="Phone Number" required>
-        <input type="date" id="signupBirthday" required>
-        <input type="password" id="signupPassword" placeholder="Create Password" required>
-        <button type="submit">Sign Up</button>
-      </form>
-    </div>
-
-    <!-- Messages -->
-    <div id="message"></div>
-  </div>
-
-  <script>
-    const REPO = "maliq273/IsaacsPOS_Hub";
-    const CUSTOMERS_FILE = "customers.json";
-    const BRANCH = "main";
-
-    function openTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
-    }
-
-    async function loadStore() {
-      const storeLabel = document.getElementById("store-name");
-      const welcomeText = document.getElementById("welcome-text");
-      const splashText = document.getElementById("splash-text");
-      try {
-        const resp = await fetch("https://raw.githubusercontent.com/" + REPO + "/main/company_info.json");
-        const data = await resp.json();
-        storeLabel.textContent = `You are visiting: ${data.name}`;
-        welcomeText.textContent = `🌱 Welcome to ${data.name}`;
-        splashText.textContent = `🌱 Welcome to ${data.name}`;
-      } catch {
-        storeLabel.textContent = "Welcome! (Store info not available)";
-        welcomeText.textContent = "🌱 Welcome to IsaacsPOS";
-      }
-    }
-    loadStore();
-
-    setTimeout(() => {
-      document.getElementById("splash").style.opacity = 0;
-      setTimeout(() => {
-        document.getElementById("splash").style.display = "none";
-        document.getElementById("main-content").style.display = "block";
-      }, 1000);
-    }, 2500);
-
-    async function loadCustomers() {
-      const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${CUSTOMERS_FILE}?nocache=${Date.now()}`);
-      return await resp.json();
-    }
-
-    document.getElementById("loginForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const user = document.getElementById("loginUser").value.trim();
-      const pass = document.getElementById("loginPassword").value.trim();
-      try {
-        const customers = aw<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IsaacsPOS Customer Portal</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       overflow: hidden;
-      position: relative;
-      background: #e8f5e9;
     }
 
-    /* Background fade-in */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: url("https://i.ibb.co/Fbzc1kJf/vecteezy-japanese-garden-at-famous-kinkakuji-12235571.jpg") center/cover no-repeat;
-      z-index: -3;
-      opacity: 0;
-      animation: fadeInBg 2s forwards;
-    }
-    @keyframes fadeInBg {
-      to { opacity: 1; }
-    }
-
-    /* Splash screen brilliant animation */
-    .splash {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #4caf50, #1b5e20);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 1000;
-      transition: opacity 1s ease;
-      color: white;
-      text-align: center;
-    }
     .splash h1 {
-      font-size: 3rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      text-shadow: 0 0 20px rgba(255,255,255,0.8);
-      animation: zoomIn 2s ease, glow 2s infinite alternate;
-    }
-    .splash p {
-      font-size: 1.3rem;
-      margin-top: 15px;
-      opacity: 0;
-      animation: fadeInUp 2s ease forwards 1.5s;
-    }
-    @keyframes zoomIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 10px #a5d6a7, 0 0 20px #66bb6a; }
-      to { text-shadow: 0 0 25px #ffffff, 0 0 40px #c8e6c9; }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      animation: ripple 3s infinite ease-in-out;
     }
 
-    /* Falling leaves */
+    @keyframes ripple {
+      0% { text-shadow: 0 0 5px #fff, 0 0 10px #66bb6a; }
+      50% { text-shadow: 0 0 20px #a5d6a7, 0 0 40px #388e3c; }
+      100% { text-shadow: 0 0 5px #fff, 0 0 10px #66bb6a; }
+    }
+
+    /* Floating leaves */
     .leaf {
       position: fixed;
       top: -50px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      opacity: 0.85;
+      width: 40px;
+      height: 40px;
+      background: url('https://i.ibb.co/7N5NwKy/autumn-leaf.png') no-repeat center/contain;
+      opacity: 0.8;
       pointer-events: none;
+      animation: fall 12s linear infinite;
     }
-    .leaf.autumn { background-image: url('https://i.ibb.co/0Xb3bGn/autumn-leaf.png'); }
-    .leaf.green { background-image: url('https://i.ibb.co/1rXYg2M/leaf.png'); }
-
     @keyframes fall {
-      0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0.7; }
-    }
-    @keyframes sway {
-      0% { transform: translateX(0px); }
-      50% { transform: translateX(40px); }
-      100% { transform: translateX(-40px); }
+      0% { transform: translateY(-50px) rotate(0deg); }
+      50% { transform: translateX(30px) rotate(180deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
     }
 
     /* Main container */
@@ -373,29 +68,27 @@
       display: none;
       width: 100%;
       max-width: 420px;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 35px 25px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 16px;
+      padding: 30px 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       text-align: center;
       animation: fadeIn 1s ease forwards;
-      position: relative;
-      z-index: 1;
     }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    h1#welcome-text {
-      font-size: 1.9rem;
+    h1 {
+      font-size: 1.8rem;
       color: #2e7d32;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
     #store-name {
       font-size: 1rem;
-      color: #444;
+      color: #555;
       margin-bottom: 20px;
     }
 
@@ -423,6 +116,7 @@
       background: #66bb6a;
       color: white;
     }
+
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
@@ -438,11 +132,11 @@
       border: 1px solid #ccc;
       font-size: 1rem;
       outline: none;
-      transition: border 0.3s, box-shadow 0.3s;
+      transition: border 0.3s;
     }
     input:focus {
       border-color: #66bb6a;
-      box-shadow: 0 0 6px rgba(102, 187, 106, 0.4);
+      box-shadow: 0 0 5px rgba(102, 187, 106, 0.3);
     }
     button {
       padding: 12px;
@@ -453,12 +147,10 @@
       font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #388e3c;
-      transform: translateY(-2px);
-    }
+    button:hover { background: #388e3c; }
+
     #message {
       margin-top: 15px;
       font-weight: bold;
@@ -469,15 +161,21 @@
 <body>
   <!-- Splash Screen -->
   <div class="splash" id="splash">
-    <h1>✨ Welcome to Isaacs and Partners ✨</h1>
+    <h1>🌱 Welcome to Isaacs and Partners</h1>
     <p>Loading your experience...</p>
   </div>
 
-  <!-- Leaves will be inserted by JS -->
+  <!-- Leaves -->
+  <div class="leaf" style="left:10%; animation-delay:0s;"></div>
+  <div class="leaf" style="left:30%; animation-delay:3s;"></div>
+  <div class="leaf" style="left:50%; animation-delay:6s;"></div>
+  <div class="leaf" style="left:70%; animation-delay:9s;"></div>
+  <div class="leaf" style="left:90%; animation-delay:12s;"></div>
 
   <!-- Main Content -->
   <div class="container" id="main-content">
-    <h1 id="welcome-text"></h1> <!-- Only once: Welcome to StoreName -->
+    <h1 id="welcome-text">🌱 Welcome</h1>
+    <p id="store-name">Loading store information...</p>
 
     <!-- Tabs -->
     <div class="tabs">
@@ -523,15 +221,18 @@
       document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active');
     }
 
-    // Load store info
+    // Load Store Info
     async function loadStore() {
+      const storeLabel = document.getElementById("store-name");
       const welcomeText = document.getElementById("welcome-text");
       try {
         const resp = await fetch("https://raw.githubusercontent.com/" + REPO + "/main/company_info.json");
         const data = await resp.json();
+        storeLabel.textContent = `You are visiting: ${data.name}`;
         welcomeText.textContent = `🌱 Welcome to ${data.name}`;
       } catch {
-        welcomeText.textContent = "🌱 Welcome to Our Store";
+        storeLabel.textContent = "Welcome! (Store info not available)";
+        welcomeText.textContent = "🌱 Welcome";
       }
     }
     loadStore();
@@ -542,74 +243,26 @@
       setTimeout(() => {
         document.getElementById("splash").style.display = "none";
         document.getElementById("main-content").style.display = "block";
-      }, 1000);
+      }, 1500);
     }, 3000);
 
-    // Falling leaves generator with wind randomness
-    function createLeaf() {
-      const leaf = document.createElement("div");
-      leaf.classList.add("leaf");
-      leaf.classList.add(Math.random() > 0.5 ? "autumn" : "green");
-      leaf.style.left = Math.random() * 100 + "vw";
-      leaf.style.width = 20 + Math.random() * 20 + "px";
-      leaf.style.height = leaf.style.width;
-      const duration = 8 + Math.random() * 6;
-      const delay = Math.random() * 5;
-      leaf.style.animation = `fall ${duration}s linear ${delay}s infinite, sway ${3 + Math.random()*3}s ease-in-out ${delay}s infinite alternate`;
-      document.body.appendChild(leaf);
-      setTimeout(() => leaf.remove(), (duration + delay) * 1000);
-    }
-    setInterval(createLeaf, 1500);
-
-    // Customers
-    async function loadCustomers() {
-      const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${CUSTOMERS_FILE}?nocache=${Date.now()}`);
-      return await resp.json();
-    }
-
-    // Login
-    document.getElementById("loginForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const user = document.getElementById("loginUser").value.trim();
-      const pass = document.getElementById("loginPassword").value.trim();
-      try {
-        const customers = await loadCustomers();
-        const found = customers.find(c => (c.phone === user || c.name === user) && c.password === pass);
-        if (found) {
-          document.getElementById("message").textContent = `Welcome back, ${found.name}! Redirecting...`;
-          setTimeout(() => window.location.href = "cart.html?customer=" + encodeURIComponent(found.phone), 1500);
-        } else {
-          document.getElementById("message").textContent = "Invalid login details.";
-        }
-      } catch {
-        document.getElementById("message").textContent = "Error loading customer data.";
-      }
-    });
-
-    // Signup
-    document.getElementById("signupForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const name = document.getElementById("signupName").value.trim();
-      const surname = document.getElementById("signupSurname").value.trim();
-      const phone = document.getElementById("signupPhone").value.trim();
-      const birthday = document.getElementById("signupBirthday").value;
-      const password = document.getElementById("signupPassword").value;
-      try {
-        const customers = await loadCustomers();
-        if (customers.find(c => c.phone === phone)) {
-          document.getElementById("message").textContent = "Phone number already registered!";
-          return;
-        }
-        customers.push({ name, surname, phone, birthday, password });
-        document.getElementById("message").textContent = `Thanks for signing up, ${name} ${surname}! Redirecting...`;
-        setTimeout(() => window.location.href = "cart.html?customer=" + encodeURIComponent(phone), 1500);
-      } catch {
-        document.getElementById("message").textContent = "Signup failed (could not load customers).";
-      }
+    // Random wind sway for leaves
+    document.querySelectorAll(".leaf").forEach((leaf, i) => {
+      leaf.animate([
+        { transform: `translateX(0px) translateY(0px) rotate(0deg)` },
+        { transform: `translateX(${Math.random()*100-50}px) translateY(90vh) rotate(${Math.random()*360}deg)` }
+      ], {
+        duration: 12000 + Math.random()*4000,
+        iterations: Infinity,
+        easing: "ease-in-out",
+        delay: i*2000
+      });
     });
   </script>
 </body>
 </html>
+
+
 
 
 
