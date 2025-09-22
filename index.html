@@ -14,7 +14,7 @@
       background-size: cover;
     }
 
-    /* Splash screen */
+    /* Splash */
     #splash {
       position: absolute;
       width: 100%;
@@ -72,6 +72,7 @@
       background: rgba(255,255,255,0.9);
       padding: 20px;
       border-radius: 10px;
+      margin-bottom: 20px;
     }
 
     input {
@@ -100,15 +101,18 @@
     }
 
     @keyframes fall {
-      to {
-        transform: translateY(110vh) rotate(360deg);
-      }
+      to { transform: translateY(110vh) rotate(360deg); }
     }
-
     @keyframes sway {
       0% { transform: translateX(0px); }
       50% { transform: translateX(20px); }
       100% { transform: translateX(0px); }
+    }
+
+    #message {
+      font-weight: bold;
+      margin-top: 10px;
+      color: #333;
     }
   </style>
 </head>
@@ -120,53 +124,117 @@
 
   <!-- Login -->
   <div id="login">
-    <h2>Welcome to <span id="companyName">Company</span></h2>
-    <form>
-      <input type="text" placeholder="Name or Phone" required>
-      <input type="password" placeholder="Password" required>
+    <h2>Welcome to <span id="companyName">Loading...</span></h2>
+
+    <!-- Login form -->
+    <form id="loginForm">
+      <input type="text" id="loginUser" placeholder="Name or Phone" required>
+      <input type="password" id="loginPassword" placeholder="Password" required>
       <button type="submit">Login</button>
     </form>
-    <p>Or sign up:</p>
-    <form>
-      <input type="text" placeholder="Name" required>
-      <input type="text" placeholder="Surname" required>
-      <input type="text" placeholder="Phone" required>
-      <input type="date" placeholder="Birthday" required>
-      <input type="password" placeholder="Create Password" required>
+
+    <!-- Signup form -->
+    <form id="signupForm">
+      <input type="text" id="signupName" placeholder="Name" required>
+      <input type="text" id="signupSurname" placeholder="Surname" required>
+      <input type="text" id="signupPhone" placeholder="Phone" required>
+      <input type="date" id="signupBirthday" required>
+      <input type="password" id="signupPassword" placeholder="Create Password" required>
       <button type="submit">Sign Up</button>
     </form>
+
+    <div id="message"></div>
   </div>
 
   <script>
-    // Fade splash -> login
+    const REPO = "maliq273/IsaacsPOS_Hub";
+    const CUSTOMERS_FILE = "customers.json";
+    const BRANCH = "main";
+
+    // Splash → Login transition
     setTimeout(() => {
       document.getElementById("splash").style.display = "none";
       document.getElementById("login").style.display = "flex";
     }, 4000);
 
-    // Dynamic company name (simulated for now)
-    document.getElementById("companyName").textContent = "IsaacsPOS";
+    // Load store info
+    async function loadStore() {
+      try {
+        const resp = await fetch("https://raw.githubusercontent.com/" + REPO + "/main/company_info.json");
+        const data = await resp.json();
+        document.getElementById("companyName").textContent = data.name;
+        document.querySelector("#splash h1").textContent = "Welcome to " + data.name;
+      } catch {
+        document.getElementById("companyName").textContent = "IsaacsPOS";
+      }
+    }
+    loadStore();
+
+    // Load customers.json
+    async function loadCustomers() {
+      const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${CUSTOMERS_FILE}?nocache=${Date.now()}`);
+      return await resp.json();
+    }
+
+    // Login handler
+    document.getElementById("loginForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const user = document.getElementById("loginUser").value.trim();
+      const pass = document.getElementById("loginPassword").value.trim();
+      try {
+        const customers = await loadCustomers();
+        const found = customers.find(c => (c.phone === user || c.name === user) && c.password === pass);
+        if (found) {
+          document.getElementById("message").textContent = `Welcome back, ${found.name}! Redirecting...`;
+          setTimeout(() => window.location.href = "cart.html?customer=" + encodeURIComponent(found.phone), 1500);
+        } else {
+          document.getElementById("message").textContent = "Invalid login details.";
+        }
+      } catch {
+        document.getElementById("message").textContent = "Error loading customer data.";
+      }
+    });
+
+    // Signup handler
+    document.getElementById("signupForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = document.getElementById("signupName").value.trim();
+      const surname = document.getElementById("signupSurname").value.trim();
+      const phone = document.getElementById("signupPhone").value.trim();
+      const birthday = document.getElementById("signupBirthday").value;
+      const password = document.getElementById("signupPassword").value;
+
+      try {
+        const customers = await loadCustomers();
+        if (customers.find(c => c.phone === phone)) {
+          document.getElementById("message").textContent = "Phone number already registered!";
+          return;
+        }
+        customers.push({ name, surname, phone, birthday, password });
+        document.getElementById("message").textContent = `Thanks for signing up, ${name} ${surname}! Redirecting...`;
+        setTimeout(() => window.location.href = "cart.html?customer=" + encodeURIComponent(phone), 1500);
+      } catch {
+        document.getElementById("message").textContent = "Signup failed (could not load customers).";
+      }
+    });
 
     // Falling leaves generator
     function createLeaf() {
       const leaf = document.createElement("img");
       leaf.src = "https://i.ibb.co/LXrD5sX3/group-of-leaves-1970804.png";
       leaf.classList.add("leaf");
-      
-      const size = Math.random() * 40 + 20; // 20px - 60px
+      const size = Math.random() * 40 + 20;
       leaf.style.width = size + "px";
       leaf.style.left = Math.random() * window.innerWidth + "px";
       leaf.style.animation = `fall ${6 + Math.random() * 6}s linear, sway ${3 + Math.random() * 3}s ease-in-out infinite`;
-
       document.body.appendChild(leaf);
-
       setTimeout(() => leaf.remove(), 12000);
     }
-
     setInterval(createLeaf, 600);
   </script>
 </body>
 </html>
+
 
 
 
