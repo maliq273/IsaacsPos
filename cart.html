@@ -1,188 +1,160 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Cart - IsaacsPOS</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f1f8e9;
-      color: #2f4f2f;
-    }
-    header {
-      background: #388e3c;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    h2 { color: #1b5e20; }
-    .container { padding: 20px; }
-    .products, .cart, .recommend { margin-bottom: 30px; }
-    .item {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin: 5px;
-      border-radius: 10px;
-      background: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    button {
-      background: #43a047;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-    button:hover { background: #2e7d32; }
-    #checkout {
-      background: #2e7d32;
-      width: 100%;
-      padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cart — IsaacsPOS</title>
+<style>
+  :root{--accent:#66bb6a;--muted:#556;}
+  body{font-family:Inter,Segoe UI,Arial; margin:0; min-height:100vh; background:#f6fbf7; color:#123; display:flex; align-items:center; justify-content:center;}
+  .page { width:100%; max-width:960px; padding:20px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .brand { font-weight:700; color:var(--accent); font-size:1.25rem; }
+  .grid { display:grid; grid-template-columns: 1fr 360px; gap:18px; align-items:start; }
+  .panel { background:white; padding:16px; border-radius:12px; box-shadow:0 8px 20px rgba(10,30,10,0.06); }
+  .list { display:flex; flex-direction:column; gap:8px; max-height:62vh; overflow:auto; padding-right:6px;}
+  .product {display:flex; justify-content:space-between; gap:8px; align-items:center; padding:10px; border-radius:8px; border:1px solid #eef7ee;}
+  .product .meta {display:flex; gap:12px; align-items:center;}
+  .product .meta img{width:56px;height:56px;object-fit:cover;border-radius:8px;}
+  .product button { background:var(--accent); color:white; border:none; padding:8px 10px; border-radius:8px; cursor:pointer;}
+  .cart-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #eee;}
+  .cart-footer { margin-top:14px; text-align:right;}
+  select, input[type=number] { padding:8px; border-radius:8px; border:1px solid #ddd; }
+  .staff-select { width:100%; margin-bottom:10px; }
+  .checkout { width:100%; padding:12px; border-radius:10px; border:none; background:var(--accent); color:white; font-weight:700; cursor:pointer;}
+  small.helper{ color:#666; display:block; margin-top:6px;}
+</style>
 </head>
 <body>
-  <header>
-    <h1>🛒 IsaacsPOS - Your Cart</h1>
-    <p id="customerInfo">Loading customer...</p>
-  </header>
+  <div class="page">
+    <header>
+      <div class="brand">IsaacsPOS — Customer Cart</div>
+      <div id="customerBox">Loading customer…</div>
+    </header>
 
-  <div class="container">
-    <section class="recommend">
-      <h2>🌟 Recommended for You</h2>
-      <div id="recommendList">Loading suggestions...</div>
-    </section>
+    <div class="grid">
+      <div class="panel">
+        <h3>Products & Services</h3>
+        <div id="productList" class="list" aria-live="polite"></div>
+      </div>
 
-    <section class="products">
-      <h2>Available Products</h2>
-      <div id="productList">Loading inventory...</div>
-    </section>
-
-    <section class="cart">
-      <h2>Your Cart</h2>
-      <div id="cartList">Cart is empty.</div>
-      <p><strong>Total: R<span id="cartTotal">0.00</span></strong></p>
-      <button id="checkout">Checkout</button>
-    </section>
+      <div class="panel">
+        <h3>Your Cart</h3>
+        <div id="cartList"></div>
+        <div class="cart-footer">
+          <div style="margin-bottom:8px"><strong>Total: R<span id="total">0.00</span></strong></div>
+          <div>
+            <select id="staffSelect" class="staff-select"><option>Loading staff…</option></select>
+            <small class="helper">Choose a staff member to serve you</small>
+          </div>
+          <button id="checkoutBtn" class="checkout">Checkout (create presale)</button>
+          <div id="msg" style="margin-top:8px;font-weight:600;color:#2e7d32"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    const REPO = "maliq273/IsaacsPOS_Hub";
-    const INVENTORY_FILE = "inventory.json";
-    const CUSTOMERS_FILE = "customers.json";
+<script>
+const BACKEND_BASE = "http://YOUR_POS_BACKEND:5000"; // <<-- edit to your backend hostname
+let customerPhone = null;
+let inventory = [];
+let staffList = [];
+let cart = [];
 
-    let inventory = [];
-    let cart = [];
+/* get customer param */
+const urlParams = new URLSearchParams(window.location.search);
+customerPhone = urlParams.get('customer') || localStorage.getItem('isaacs_customer_phone') || null;
+if(customerPhone) document.getElementById('customerBox').textContent = "You: " + customerPhone;
+else document.getElementById('customerBox').textContent = "Guest";
 
-    // Get customer from query string
-    const urlParams = new URLSearchParams(window.location.search);
-    const customerPhone = urlParams.get("customer");
-    let customer = null;
+/* load inventory + staff */
+async function loadInventory(){
+  const r = await fetch(`${BACKEND_BASE}/api/inventory`);
+  if(!r.ok) { console.error('inventory'); return; }
+  inventory = await r.json();
+  renderProducts();
+}
+async function loadStaff(){
+  const r = await fetch(`${BACKEND_BASE}/api/staff`);
+  if(!r.ok) { console.error('staff'); return; }
+  staffList = await r.json();
+  const sel = document.getElementById('staffSelect');
+  sel.innerHTML = staffList.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+}
 
-    async function loadCustomer() {
-      try {
-        const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${CUSTOMERS_FILE}?nocache=${Date.now()}`);
-        const customers = await resp.json();
-        customer = customers.find(c => c.phone === customerPhone);
-        document.getElementById("customerInfo").textContent = customer 
-          ? `Welcome, ${customer.name} ${customer.surname}!` 
-          : "Customer not found.";
-      } catch {
-        document.getElementById("customerInfo").textContent = "Error loading customer.";
-      }
-    }
+/* render products */
+function renderProducts(){
+  const c = document.getElementById('productList'); c.innerHTML='';
+  inventory.forEach(p=>{
+    const el = document.createElement('div'); el.className='product';
+    el.innerHTML = `<div class="meta">
+      <img src="${p.image || 'https://placehold.co/56x56'}" alt="" />
+      <div><strong>${p.name}</strong><div style="color:#666;font-size:13px">R${Number(p.price).toFixed(2)} ${p.type||''}</div></div>
+    </div>
+    <div><button data-id="${p.id}">Add</button></div>`;
+    c.appendChild(el);
+  });
+  document.querySelectorAll('.product button').forEach(b=>{
+    b.addEventListener('click', ()=> { const id = b.dataset.id; addToCart(id); });
+  });
+}
 
-    async function loadInventory() {
-      try {
-        const resp = await fetch(`https://raw.githubusercontent.com/${REPO}/main/${INVENTORY_FILE}?nocache=${Date.now()}`);
-        inventory = await resp.json();
-        renderProducts();
-        suggestProducts();
-      } catch {
-        document.getElementById("productList").textContent = "Error loading inventory.";
-      }
-    }
+/* cart handling */
+function addToCart(productId){
+  const p = inventory.find(x=>String(x.id) === String(productId));
+  if(!p){ return; }
+  const line = cart.find(x=>x.product_id == p.id);
+  if(line){ line.qty += 1; } else cart.push({ product_id:p.id, name:p.name, qty:1, price:Number(p.price) });
+  renderCart();
+}
+function renderCart(){
+  const el = document.getElementById('cartList'); el.innerHTML='';
+  let total = 0;
+  cart.forEach((ln, idx)=>{
+    total += ln.qty * ln.price;
+    const row = document.createElement('div'); row.className='cart-row';
+    row.innerHTML = `<div>${ln.name} <span style="color:#666">x${ln.qty}</span></div>
+      <div>R${(ln.qty*ln.price).toFixed(2)} <button data-i="${idx}">—</button></div>`;
+    el.appendChild(row);
+  });
+  document.querySelectorAll('.cart-row button').forEach(b=>b.addEventListener('click', ()=>{
+    const i = Number(b.dataset.i);
+    cart.splice(i,1);
+    renderCart();
+  }));
+  document.getElementById('total').textContent = total.toFixed(2);
+}
 
-    function renderProducts() {
-      const container = document.getElementById("productList");
-      container.innerHTML = "";
-      inventory.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <span>${item.name} - R${item.price.toFixed(2)} (Stock: ${item.stock})</span>
-          <button onclick="addToCart('${item.name}', ${item.price})">Add</button>
-        `;
-        container.appendChild(div);
-      });
-    }
+/* checkout -> push presale to backend (which updates GitHub presales.json) */
+document.getElementById('checkoutBtn').addEventListener('click', async ()=>{
+  if(cart.length === 0) { document.getElementById('msg').textContent = 'Cart is empty.'; return; }
+  const staff_id = document.getElementById('staffSelect').value;
+  const payload = {
+    customer_phone: customerPhone || null,
+    staff_id: staff_id || null,
+    items: cart,
+    total: Number(document.getElementById('total').textContent)
+  };
+  document.getElementById('msg').textContent = 'Creating presale…';
+  const r = await fetch(`${BACKEND_BASE}/api/presales`, {
+    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+  });
+  const j = await r.json();
+  if(r.ok && j.success){
+    document.getElementById('msg').textContent = 'Presale created — the cashier will see it shortly.';
+    // optionally clear cart / redirect to thankyou
+    cart = []; renderCart();
+  } else {
+    document.getElementById('msg').textContent = j.message || 'Failed creating presale';
+  }
+});
 
-    function suggestProducts() {
-      const container = document.getElementById("recommendList");
-      container.innerHTML = "";
-      if (inventory.length === 0) {
-        container.textContent = "No recommendations.";
-        return;
-      }
-      const sample = [...inventory].sort(() => 0.5 - Math.random()).slice(0, 3);
-      sample.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `
-          <span>Try: ${item.name} - R${item.price.toFixed(2)}</span>
-          <button onclick="addToCart('${item.name}', ${item.price})">Add</button>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function addToCart(name, price) {
-      cart.push({ name, price });
-      renderCart();
-    }
-
-    function renderCart() {
-      const container = document.getElementById("cartList");
-      container.innerHTML = "";
-      if (cart.length === 0) {
-        container.textContent = "Cart is empty.";
-        document.getElementById("cartTotal").textContent = "0.00";
-        return;
-      }
-      let total = 0;
-      cart.forEach(item => {
-        total += item.price;
-        const div = document.createElement("div");
-        div.className = "item";
-        div.innerHTML = `${item.name} - R${item.price.toFixed(2)}`;
-        container.appendChild(div);
-      });
-      document.getElementById("cartTotal").textContent = total.toFixed(2);
-    }
-
-    document.getElementById("checkout").addEventListener("click", () => {
-      if (!customer) {
-        alert("Customer not found!");
-        return;
-      }
-      if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-      }
-      alert(`Checkout complete! ${cart.length} items purchased for R${document.getElementById("cartTotal").textContent}.`);
-      // 🔹 In Hub phase: push presale into presales.json
-    });
-
-    loadCustomer();
-    loadInventory();
-  </script>
+/* init */
+(async function init(){
+  await Promise.all([loadInventory(), loadStaff()]);
+  renderCart();
+})();
+</script>
 </body>
 </html>
 
