@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>IsaacsPOS - Customer Login</title>
+  <title>IsaacsPOS - Customer Portal</title>
   <style>
     body {
       margin: 0;
@@ -13,6 +13,23 @@
       justify-content: center;
       height: 100vh;
     }
+    .splash {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to right, #a8e063, #56ab2f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      font-size: 2rem;
+      z-index: 10;
+      animation: fadeOut 2s ease 3s forwards;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
     .container {
       background: white;
       padding: 2rem;
@@ -20,6 +37,11 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.2);
       width: 350px;
       text-align: center;
+      opacity: 0;
+      animation: fadeIn 1s ease 5s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
     }
     h1 {
       color: #2e7d32;
@@ -55,40 +77,46 @@
       cursor: pointer;
       text-decoration: underline;
     }
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
+  <!-- Splash Screen -->
+  <div class="splash">
+    <h1>🌱 IsaacsPOS</h1>
+    <p>Welcome to your shopping experience</p>
+  </div>
+
+  <!-- Login / Signup -->
   <div class="container">
     <h1>Welcome</h1>
 
-    <!-- Signup Form -->
-    <div id="signup-form" class="">
+    <!-- Signup -->
+    <div id="signup-form">
       <input type="text" id="signup-name" placeholder="First Name" required>
       <input type="text" id="signup-surname" placeholder="Last Name" required>
       <input type="text" id="signup-phone" placeholder="Phone" required>
       <input type="password" id="signup-password" placeholder="Password" required>
       <button onclick="handleSignup()">Sign Up</button>
-      <div class="switch">Already have an account? <a onclick="showLogin()">Login</a></div>
+      <div class="switch">Already registered? <a onclick="showLogin()">Login</a></div>
     </div>
 
-    <!-- Login Form -->
+    <!-- Login -->
     <div id="login-form" class="hidden">
       <input type="text" id="login-phone" placeholder="Phone" required>
       <input type="password" id="login-password" placeholder="Password" required>
       <button onclick="handleLogin()">Login</button>
-      <div class="switch">Don't have an account? <a onclick="showSignup()">Sign Up</a></div>
+      <div class="switch">New here? <a onclick="showSignup()">Sign Up</a></div>
     </div>
   </div>
 
   <script>
     const GITHUB_REPO = "maliq273/IsaacsPOS_Hub";
     const CUSTOMERS_FILE = "customers.json";
-    const GITHUB_TOKEN = "YOUR_GITHUB_PAT"; // ⚠️ inject from backend in production
+    const BRANCH = "main";
+    const GITHUB_TOKEN = "YOUR_GITHUB_PAT"; // ⚠️ inject from server in production
 
-    // --- UI Switch ---
+    // --- UI toggle ---
     function showLogin() {
       document.getElementById("signup-form").classList.add("hidden");
       document.getElementById("login-form").classList.remove("hidden");
@@ -98,18 +126,20 @@
       document.getElementById("signup-form").classList.remove("hidden");
     }
 
-    // --- GitHub Get File ---
-    async function githubGetFile(repo, path) {
-      const res = await fetch(`https://raw.githubusercontent.com/${repo}/main/${path}`);
+    // --- GitHub Get JSON ---
+    async function githubGetJSON(repo, path) {
+      const url = `https://raw.githubusercontent.com/${repo}/${BRANCH}/${path}?nocache=${Date.now()}`;
+      const res = await fetch(url);
       if (!res.ok) throw new Error("GitHub read failed");
       return await res.json();
     }
 
-    // --- GitHub Push File ---
-    async function githubPushFile(repo, path, content, msg="Update file") {
+    // --- GitHub Push JSON ---
+    async function githubPushJSON(repo, path, jsonData, message="Update file") {
       const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
       let sha = null;
 
+      // get current sha
       const getRes = await fetch(apiUrl, {
         headers: { "Authorization": `token ${GITHUB_TOKEN}` }
       });
@@ -119,9 +149,10 @@
       }
 
       const body = {
-        message: msg,
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
-        sha: sha
+        message: message,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(jsonData, null, 2)))),
+        sha: sha,
+        branch: BRANCH
       };
 
       const res = await fetch(apiUrl, {
@@ -133,11 +164,13 @@
         body: JSON.stringify(body)
       });
 
-      if (!res.ok) throw new Error("GitHub push failed");
-      return await res.json();
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error("Push failed: " + JSON.stringify(err));
+      }
     }
 
-    // --- Signup ---
+    // --- Signup handler ---
     async function handleSignup() {
       const name = document.getElementById("signup-name").value.trim();
       const surname = document.getElementById("signup-surname").value.trim();
@@ -151,9 +184,9 @@
 
       let customers = { customers: [] };
       try {
-        customers = await githubGetFile(GITHUB_REPO, CUSTOMERS_FILE);
+        customers = await githubGetJSON(GITHUB_REPO, CUSTOMERS_FILE);
       } catch (e) {
-        console.warn("customers.json missing, will create.");
+        console.warn("customers.json not found, creating new.");
       }
 
       if (customers.customers.find(c => c.phone === phone)) {
@@ -162,12 +195,11 @@
       }
 
       customers.customers.push({ name, surname, phone, password });
-      await githubPushFile(GITHUB_REPO, CUSTOMERS_FILE, customers, `Add customer ${phone}`);
-
+      await githubPushJSON(GITHUB_REPO, CUSTOMERS_FILE, customers, `Add customer ${phone}`);
       window.location.href = "cart.html?phone=" + encodeURIComponent(phone);
     }
 
-    // --- Login ---
+    // --- Login handler ---
     async function handleLogin() {
       const phone = document.getElementById("login-phone").value.trim();
       const password = document.getElementById("login-password").value.trim();
@@ -178,7 +210,7 @@
       }
 
       try {
-        const customers = await githubGetFile(GITHUB_REPO, CUSTOMERS_FILE);
+        const customers = await githubGetJSON(GITHUB_REPO, CUSTOMERS_FILE);
         const match = customers.customers.find(c => c.phone === phone && c.password === password);
         if (match) {
           window.location.href = "cart.html?phone=" + encodeURIComponent(phone);
@@ -192,4 +224,5 @@
   </script>
 </body>
 </html>
+
 
