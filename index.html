@@ -1,272 +1,195 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Welcome — IsaacsPOS Customer Portal</title>
-<style>
-  :root{
-    --accent:#66bb6a;
-    --accent-2:#2e7d32;
-    --glass: rgba(255,255,255,0.86);
-    --muted:#4a4a4a;
-  }
-  html,body{height:100%;margin:0;font-family:Inter,Segoe UI,system-ui,Arial,sans-serif;background:#eaf7ef;}
-  /* forest background (cover) */
-  body {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background-image: url("https://i.ibb.co/Fbzc1kJf/vecteezy-japanese-garden-at-famous-kinkakuji-12235571.jpg");
-    background-size:cover;
-    background-position:center;
-    position:relative;
-    overflow:hidden;
-  }
-
-  /* gentle overlay */
-  .overlay {
-    position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.6));
-    backdrop-filter: blur(3px);
-    pointer-events:none;
-  }
-
-  /* splash (full screen) */
-  .splash {
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:40;
-    background:linear-gradient(135deg, rgba(102,187,106,0.95), rgba(46,125,50,0.95));
-    color:white;flex-direction:column;transition:opacity 0.9s ease;
-  }
-  .splash h1{margin:0;font-size:2.4rem;letter-spacing:0.6px}
-  .splash p{margin-top:8px;opacity:0.9}
-
-  /* container (center card) */
-  .card {
-    z-index:50;
-    width:100%;
-    max-width:420px;
-    border-radius:16px;
-    padding:28px;
-    background:var(--glass);
-    box-shadow:0 18px 40px rgba(16,40,20,0.18);
-    text-align:center;
-    transform: translateY(24px);
-    animation:cardIn 700ms cubic-bezier(.2,.9,.2,1) forwards;
-    display:none;
-  }
-  @keyframes cardIn { to { transform: none; opacity:1 } }
-
-  .brand { font-weight:700;color:var(--accent-2); font-size:1.2rem; margin-bottom:6px; }
-  .subtitle { color:var(--muted); margin-bottom:16px; }
-
-  /* tabs */
-  .tabs { display:flex; gap:8px;border-radius:999px;padding:6px;background:#eef7ef;margin:18px 0; }
-  .tab { flex:1;padding:10px;border-radius:999px;background:transparent;cursor:pointer;color:var(--accent-2);font-weight:600 }
-  .tab.active { background:var(--accent); color:white; box-shadow: inset 0 -2px 0 rgba(0,0,0,0.06); }
-
-  form { display:flex; flex-direction:column; gap:10px; margin-top:6px; }
-  input, button, select {
-    padding:12px 14px;border-radius:10px;border:1px solid #e3e8e3;font-size:15px;
-  }
-  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 6px 18px rgba(102,187,106,0.12); }
-  button.primary { background:var(--accent); color:white; border:none; font-weight:700; cursor:pointer; }
-  .tiny { font-size:13px; color:#666; }
-
-  /* leaves decorative layer (sway only) */
-  .leaf {
-    position:absolute; width:72px; height:auto; opacity:0.85; z-index:30; transition: transform 4s ease;
-    pointer-events:none;
-  }
-
-  /* message */
-  #message { margin-top:12px; font-weight:600; color:#2e7d32; min-height:20px; }
-
-  @media (max-width:480px){ .card{ margin: 20px; padding:20px; } .splash h1{font-size:1.6rem} }
-</style>
+  <meta charset="UTF-8">
+  <title>IsaacsPOS - Customer Login</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #a8e063, #56ab2f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+      width: 350px;
+      text-align: center;
+    }
+    h1 {
+      color: #2e7d32;
+      margin-bottom: 1rem;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      background: #43a047;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2e7d32;
+    }
+    .switch {
+      margin-top: 1rem;
+      font-size: 14px;
+    }
+    .switch a {
+      color: #2e7d32;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="overlay"></div>
+  <div class="container">
+    <h1>Welcome</h1>
 
-  <!-- splash -->
-  <div id="splash" class="splash" aria-hidden="false">
-    <h1 id="splash-title">🌿 Welcome to IsaacsPOS</h1>
-    <p id="splash-sub">Preparing a calm checkout experience...</p>
+    <!-- Signup Form -->
+    <div id="signup-form" class="">
+      <input type="text" id="signup-name" placeholder="First Name" required>
+      <input type="text" id="signup-surname" placeholder="Last Name" required>
+      <input type="text" id="signup-phone" placeholder="Phone" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      <button onclick="handleSignup()">Sign Up</button>
+      <div class="switch">Already have an account? <a onclick="showLogin()">Login</a></div>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" class="hidden">
+      <input type="text" id="login-phone" placeholder="Phone" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button onclick="handleLogin()">Login</button>
+      <div class="switch">Don't have an account? <a onclick="showSignup()">Sign Up</a></div>
+    </div>
   </div>
 
-  <!-- floating leaves decorations -->
-  <img class="leaf" src="https://i.ibb.co/LXrD5sX3/group-of-leaves-1970804.png" style="left:6%; top:10%; transform: rotate(-8deg) scale(.9);" />
-  <img class="leaf" src="https://i.ibb.co/XxrbBwQm/vecteezy-group-of-leaves-1970804.jpg" style="right:6%; top:14%; transform: rotate(8deg) scale(.7);" />
-  <img class="leaf" src="https://i.ibb.co/LXrD5sX3/group-of-leaves-1970804.png" style="left:30%; bottom:8%; transform: rotate(20deg) scale(.6);" />
+  <script>
+    const GITHUB_REPO = "maliq273/IsaacsPOS_Hub";
+    const CUSTOMERS_FILE = "customers.json";
+    const GITHUB_TOKEN = "YOUR_GITHUB_PAT"; // ⚠️ inject from backend in production
 
-  <div class="card" id="card" role="main" aria-labelledby="cardTitle">
-    <div class="brand" id="cardTitle">IsaacsPOS — Customer Portal</div>
-    <div class="subtitle" id="companyLine">Loading store…</div>
-
-    <div class="tabs" role="tablist" aria-label="Authentication">
-      <div class="tab active" id="tab-login" role="tab" aria-selected="true" onclick="openTab('login')">Login</div>
-      <div class="tab" id="tab-signup" role="tab" aria-selected="false" onclick="openTab('signup')">Sign up</div>
-    </div>
-
-    <div id="login" class="tab-panel">
-      <form id="loginForm" autocomplete="on">
-        <input id="loginUser" name="user" placeholder="Name or phone" required />
-        <input id="loginPassword" name="password" type="password" placeholder="Password" required />
-        <button class="primary" type="submit">Login</button>
-      </form>
-    </div>
-
-    <div id="signup" class="tab-panel" style="display:none;">
-      <form id="signupForm" autocomplete="on">
-        <input id="signupName" placeholder="First name" required />
-        <input id="signupSurname" placeholder="Surname" required />
-        <input id="signupPhone" placeholder="Phone (include country code)" required />
-        <input id="signupBirthday" type="date" />
-        <input id="signupPassword" type="password" placeholder="Create password" required />
-        <button class="primary" type="submit">Create account</button>
-      </form>
-    </div>
-
-    <div id="message" aria-live="polite"></div>
-  </div>
-
-<script>
-/* CONFIG - set backend URL (POS backend) */
-const BACKEND_BASE = "http://YOUR_POS_BACKEND:5000"; // <<-- EDIT to your POS backend
-const REPO = "maliq273/IsaacsPOS"; // informational
-
-/* UI helpers */
-function openTab(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
-  document.getElementById('tab-'+name).classList.add('active');
-  document.getElementById(name).style.display='block';
-}
-
-/* splash -> show card */
-function showCard(){
-  document.getElementById('splash').style.opacity='0';
-  setTimeout(()=>{ document.getElementById('splash').style.display='none'; document.getElementById('card').style.display='block'; }, 700);
-}
-
-/* load company info from GitHub via backend */
-async function loadCompany(){
-  try{
-    const r = await fetch(`${BACKEND_BASE}/api/company`);
-    if(!r.ok) throw new Error('no company');
-    const data = await r.json();
-    document.getElementById('companyLine').textContent = `You are visiting: ${data.name || 'IsaacsPOS'}`;
-    document.getElementById('splash-title').textContent = `🌿 Welcome to ${data.name || 'IsaacsPOS'}`;
-  }catch(e){
-    document.getElementById('companyLine').textContent = `Welcome`;
-  }
-}
-
-/* message helper */
-function setMessage(txt, ok=true){
-  const el = document.getElementById('message');
-  el.textContent = txt;
-  el.style.color = ok ? '#1b5e20' : '#b00020';
-}
-
-/* Forms: Login / Signup -> call backend which will read/write customers.json in GitHub */
-async function postJSON(url, body){
-  return fetch(url, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  });
-}
-
-/* Login flow */
-document.getElementById('loginForm').addEventListener('submit', async (ev)=>{
-  ev.preventDefault();
-  setMessage("Signing in...");
-  const user = document.getElementById('loginUser').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  try{
-    const resp = await fetch(`${BACKEND_BASE}/api/customers/validate`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({user, password})
-    });
-    const j = await resp.json();
-    if(resp.ok && j.success){
-      setMessage(`Welcome back, ${j.name}. Redirecting…`);
-      // store token/local info then go to cart
-      localStorage.setItem('isaacs_customer_phone', j.phone);
-      setTimeout(()=> window.location.href = "cart.html?customer="+encodeURIComponent(j.phone), 700);
-    }else{
-      setMessage(j.message || 'Invalid credentials', false);
+    // --- UI Switch ---
+    function showLogin() {
+      document.getElementById("signup-form").classList.add("hidden");
+      document.getElementById("login-form").classList.remove("hidden");
     }
-  }catch(err){
-    setMessage('Login failed (connection)', false);
-  }
-});
-
-/* Signup flow */
-document.getElementById('signupForm').addEventListener('submit', async (ev)=>{
-  ev.preventDefault();
-  setMessage("Creating account...");
-  const payload = {
-    name: document.getElementById('signupName').value.trim(),
-    surname: document.getElementById('signupSurname').value.trim(),
-    phone: document.getElementById('signupPhone').value.trim(),
-    birthday: document.getElementById('signupBirthday').value,
-    password: document.getElementById('signupPassword').value
-  };
-  try{
-    const r = await postJSON(`${BACKEND_BASE}/api/customers`, payload);
-    const j = await r.json();
-    if(r.ok && j.success){
-      setMessage('Account created — redirecting…');
-      localStorage.setItem('isaacs_customer_phone', payload.phone);
-      setTimeout(()=> window.location.href = "cart.html?customer="+encodeURIComponent(payload.phone), 800);
-    }else{
-      setMessage(j.message || 'Signup failed', false);
+    function showSignup() {
+      document.getElementById("login-form").classList.add("hidden");
+      document.getElementById("signup-form").classList.remove("hidden");
     }
-  }catch(e){
-    setMessage('Signup failed (connection)', false);
-  }
-});
 
-/* init UI */
-(async function init(){
-  await loadCompany();
-  // show splash then card
-  setTimeout(showCard, 1800);
-})();
-</script>
+    // --- GitHub Get File ---
+    async function githubGetFile(repo, path) {
+      const res = await fetch(`https://raw.githubusercontent.com/${repo}/main/${path}`);
+      if (!res.ok) throw new Error("GitHub read failed");
+      return await res.json();
+    }
+
+    // --- GitHub Push File ---
+    async function githubPushFile(repo, path, content, msg="Update file") {
+      const apiUrl = `https://api.github.com/repos/${repo}/contents/${path}`;
+      let sha = null;
+
+      const getRes = await fetch(apiUrl, {
+        headers: { "Authorization": `token ${GITHUB_TOKEN}` }
+      });
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+      }
+
+      const body = {
+        message: msg,
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+        sha: sha
+      };
+
+      const res = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Authorization": `token ${GITHUB_TOKEN}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) throw new Error("GitHub push failed");
+      return await res.json();
+    }
+
+    // --- Signup ---
+    async function handleSignup() {
+      const name = document.getElementById("signup-name").value.trim();
+      const surname = document.getElementById("signup-surname").value.trim();
+      const phone = document.getElementById("signup-phone").value.trim();
+      const password = document.getElementById("signup-password").value.trim();
+
+      if (!name || !surname || !phone || !password) {
+        alert("All fields required!");
+        return;
+      }
+
+      let customers = { customers: [] };
+      try {
+        customers = await githubGetFile(GITHUB_REPO, CUSTOMERS_FILE);
+      } catch (e) {
+        console.warn("customers.json missing, will create.");
+      }
+
+      if (customers.customers.find(c => c.phone === phone)) {
+        alert("Phone already registered!");
+        return;
+      }
+
+      customers.customers.push({ name, surname, phone, password });
+      await githubPushFile(GITHUB_REPO, CUSTOMERS_FILE, customers, `Add customer ${phone}`);
+
+      window.location.href = "cart.html?phone=" + encodeURIComponent(phone);
+    }
+
+    // --- Login ---
+    async function handleLogin() {
+      const phone = document.getElementById("login-phone").value.trim();
+      const password = document.getElementById("login-password").value.trim();
+
+      if (!phone || !password) {
+        alert("All fields required!");
+        return;
+      }
+
+      try {
+        const customers = await githubGetFile(GITHUB_REPO, CUSTOMERS_FILE);
+        const match = customers.customers.find(c => c.phone === phone && c.password === password);
+        if (match) {
+          window.location.href = "cart.html?phone=" + encodeURIComponent(phone);
+        } else {
+          alert("Invalid phone or password!");
+        }
+      } catch (e) {
+        alert("Login failed: " + e.message);
+      }
+    }
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
