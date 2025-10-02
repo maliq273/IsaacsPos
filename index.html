@@ -1,114 +1,225 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IsaacsPOS Customer Login</title>
-<style>
-/* General */
-body { font-family: Arial, sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-
-/* Container */
-.container { background:white; padding:30px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); width:320px; text-align:center; }
-h2 { margin-bottom:20px; }
-input { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc; }
-button { width:100%; padding:10px; border:none; border-radius:6px; background:#28a745; color:white; font-weight:bold; cursor:pointer; }
-button:hover { background:#218838; }
-.message { margin-top:15px; text-align:center; color:red; }
-
-/* Splash screen */
-#splash { position:fixed; top:0; left:0; width:100%; height:100%; background:#28a745; color:white; display:flex; justify-content:center; align-items:center; font-size:2em; z-index:999; flex-direction:column; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IsaacsPOS — Customer Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{background:#f6f9fc;font-family:Segoe UI,Arial;}
+    .card{border-radius:12px;box-shadow:0 6px 22px rgba(0,0,0,.06)}
+    .small-muted{font-size:.9rem;color:#6c757d}
+  </style>
 </head>
 <body>
-<div id="splash">
-    <h1>Welcome to IsaacsPOS</h1>
-</div>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="card p-4">
+        <h3 class="mb-3">Welcome — Customer portal</h3>
+        <p class="small-muted">Choose the company you're visiting, sign up or log in using phone + password.</p>
 
-<div class="container" id="loginContainer" style="display:none;">
-    <h2>Customer Login / Signup</h2>
-    <input type="text" id="namePhone" placeholder="Name or Phone" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button id="loginBtn">Enter</button>
-    <div class="message" id="message"></div>
+        <!-- Company selector -->
+        <div class="mb-3">
+          <label class="form-label">Select company</label>
+          <select id="companySelect" class="form-select"></select>
+        </div>
+
+        <hr />
+
+        <!-- Signup -->
+        <h5>Sign up</h5>
+        <div id="signupAlert" class="alert d-none"></div>
+        <div class="row g-2 mb-3">
+          <div class="col-md-6"><input id="signupName" class="form-control" placeholder="First name"></div>
+          <div class="col-md-6"><input id="signupSurname" class="form-control" placeholder="Surname"></div>
+          <div class="col-md-6"><input id="signupPhone" class="form-control" placeholder="Phone (include country code, e.g. +27...)"></div>
+          <div class="col-md-6"><input id="signupPassword" class="form-control" type="password" placeholder="Password"></div>
+        </div>
+        <div class="mb-3">
+          <button id="btnSignup" class="btn btn-success">Sign up</button>
+          <span class="small-muted ms-2">We'll send your PIN/password via WhatsApp (Hub handles this).</span>
+        </div>
+
+        <hr />
+
+        <!-- Login -->
+        <h5>Log in</h5>
+        <div id="loginAlert" class="alert d-none"></div>
+        <div class="row g-2 mb-3">
+          <div class="col-md-6"><input id="loginPhone" class="form-control" placeholder="Phone"></div>
+          <div class="col-md-6"><input id="loginPassword" class="form-control" type="password" placeholder="Password"></div>
+        </div>
+        <div class="mb-3">
+          <button id="btnLogin" class="btn btn-primary">Login</button>
+          <a id="cartLink" class="btn btn-outline-secondary ms-2" href="#" style="display:none">Go to Cart</a>
+        </div>
+
+        <hr />
+        <p class="small-muted">If your company isn't listed, contact the business so they can register with the Hub.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-// === CONFIGURATION ===
-const GITHUB_OWNER = "YourGitHubUsername";
-const GITHUB_REPO = "IsaacsPOS";
-const GITHUB_PATH = "repo/customers.json";
-const GITHUB_TOKEN = "ghp_YOUR_PERSONAL_ACCESS_TOKEN"; // Replace with your PAT
+/*
+  index.html behavior:
+  - Loads clients.json from the GitHub raw URL to populate company selector
+  - Signup -> POST to hub endpoint /api/customer_signup (Hub must implement)
+      payload: { company_name, name, surname, phone, password_hash }
+      Hub should: append the customer to repo customers.json under company_name and return {ok:true, customer_id}
+  - Login -> reads customers.json from GitHub raw and validates locally using SHA-256 of password (client-side)
+      NOTE: reading raw GitHub is only for login convenience. Final authority should be Hub.
+  - After login, the page reveals "Go to Cart" link (cart.html?company=...) passing company name and phone (URL encoded)
+*/
 
-const splash = document.getElementById("splash");
-const loginContainer = document.getElementById("loginContainer");
-const message = document.getElementById("message");
+const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPOS/main';
+const HUB_BASE = location.origin; // assumes hub runs on same host, otherwise set hub url explicitly
 
-// === Splash Animation ===
-setTimeout(() => {
-    splash.style.display = "none";
-    loginContainer.style.display = "block";
-}, 2000);
-
-// === GitHub API Functions ===
-async function fetchCustomers() {
-    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
-    const res = await fetch(url, { headers: { Authorization: `token ${GITHUB_TOKEN}` } });
-    if (res.status === 404) return { content: [], sha: null }; // file doesn't exist
-    if (!res.ok) throw new Error("Failed to fetch customers.json");
-    const data = await res.json();
-    const content = atob(data.content);
-    return { content: JSON.parse(content), sha: data.sha };
+/* small helper: sha256 -> hex */
+async function sha256hex(message) {
+  const msg = new TextEncoder().encode(message);
+  const digest = await crypto.subtle.digest('SHA-256', msg);
+  const hex = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('');
+  return hex;
 }
 
-async function saveCustomers(customers, sha) {
-    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
-    const body = {
-        message: "Update customers.json",
-        content: btoa(JSON.stringify(customers, null, 2)),
-        sha: sha
-    };
-    const res = await fetch(url, {
-        method: "PUT",
-        headers: { Authorization: `token ${GITHUB_TOKEN}`, "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-    });
-    if (!res.ok) throw new Error("Failed to save customers.json");
-}
-
-// === Login / Signup Logic ===
-document.getElementById("loginBtn").addEventListener("click", async () => {
-    const namePhone = document.getElementById("namePhone").value.trim();
-    const password = document.getElementById("password").value.trim();
-    message.style.color = "red";
-
-    if (!namePhone || !password) { message.textContent = "All fields required"; return; }
-
-    try {
-        let { content: customers, sha } = await fetchCustomers();
-        const existing = customers.find(c => c.namePhone === namePhone);
-
-        if (existing) {
-            if (existing.password !== password) {
-                message.textContent = "Incorrect password";
-                return;
-            }
-            message.style.color = "green";
-            message.textContent = "Login successful!";
-        } else {
-            customers.push({ namePhone, password, created: new Date().toISOString() });
-            await saveCustomers(customers, sha);
-            message.style.color = "green";
-            message.textContent = "Signup successful!";
-        }
-    } catch (err) {
-        console.error(err);
-        message.textContent = "Error connecting to GitHub";
+/* fetch clients.json and populate select */
+async function loadClients() {
+  const sel = document.getElementById('companySelect');
+  sel.innerHTML = '<option>Loading companies...</option>';
+  try {
+    const r = await fetch(`${RAW_BASE}/clients.json`, {cache:'no-store'});
+    if (!r.ok) throw new Error(r.statusText);
+    const j = await r.json();
+    const clients = j.clients || [];
+    sel.innerHTML = '';
+    for (const c of clients) {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.textContent = c.name + (c.location ? ' — '+c.location : '');
+      sel.appendChild(opt);
     }
+  } catch (e) {
+    sel.innerHTML = '<option>Error loading companies</option>';
+    console.error('loadClients', e);
+  }
+}
+
+/* signup */
+document.getElementById('btnSignup').addEventListener('click', async () => {
+  const name = document.getElementById('signupName').value.trim();
+  const surname = document.getElementById('signupSurname').value.trim();
+  const phone = document.getElementById('signupPhone').value.trim();
+  const password = document.getElementById('signupPassword').value;
+
+  const alert = document.getElementById('signupAlert');
+  alert.classList.add('d-none');
+
+  if (!name || !phone || !password) {
+    alert.className = 'alert alert-danger';
+    alert.textContent = 'Name, phone and password are required.';
+    alert.classList.remove('d-none');
+    return;
+  }
+  const company = document.getElementById('companySelect').value;
+
+  // hash password client-side before sending
+  const pw_hash = await sha256hex(password);
+
+  const payload = {
+    company_name: company,
+    name, surname, phone,
+    password_hash: pw_hash,
+    source: 'customer_portal'
+  };
+
+  try {
+    const resp = await fetch(`${HUB_BASE}/api/customer_signup`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (resp.ok && data && data.ok) {
+      alert.className = 'alert alert-success';
+      alert.textContent = 'Signup successful — you will receive instructions via WhatsApp shortly.';
+      alert.classList.remove('d-none');
+      // optionally redirect to cart
+      document.getElementById('cartLink').style.display = 'inline-block';
+      document.getElementById('cartLink').href = `cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}`;
+    } else {
+      alert.className = 'alert alert-danger';
+      alert.textContent = (data && data.error) ? data.error : 'Signup failed.';
+      alert.classList.remove('d-none');
+    }
+  } catch (e) {
+    alert.className = 'alert alert-danger';
+    alert.textContent = 'Network error signing up.';
+    alert.classList.remove('d-none');
+    console.error('signup', e);
+  }
 });
+
+/* login */
+document.getElementById('btnLogin').addEventListener('click', async () => {
+  const phone = document.getElementById('loginPhone').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const alert = document.getElementById('loginAlert');
+  alert.classList.add('d-none');
+
+  if (!phone || !password) {
+    alert.className = 'alert alert-danger';
+    alert.textContent = 'Phone and password required.';
+    alert.classList.remove('d-none');
+    return;
+  }
+
+  const company = document.getElementById('companySelect').value;
+
+  try {
+    // Read customers.json from GitHub (public read)
+    const r = await fetch(`${RAW_BASE}/customers.json`, {cache:'no-store'});
+    if (!r.ok) throw new Error('Could not load customers list');
+    const j = await r.json();
+    const customers = j.customers || [];
+    // find customer for this company and phone (company-name match)
+    const match = customers.find(c => (c.company_name === company) && (c.phone === phone));
+    if (!match) {
+      alert.className = 'alert alert-danger';
+      alert.textContent = 'Customer not found for this company.';
+      alert.classList.remove('d-none');
+      return;
+    }
+    // compare hashed password
+    const hashed = await sha256hex(password);
+    if (hashed === match.password_hash) {
+      alert.className = 'alert alert-success';
+      alert.textContent = 'Login OK. Redirecting to cart...';
+      alert.classList.remove('d-none');
+      setTimeout(()=> {
+        window.location.href = `cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}`;
+      }, 700);
+    } else {
+      alert.className = 'alert alert-danger';
+      alert.textContent = 'Invalid credentials.';
+      alert.classList.remove('d-none');
+    }
+  } catch (e) {
+    console.error('login', e);
+    alert.className = 'alert alert-danger';
+    alert.textContent = 'Network error while attempting login.';
+    alert.classList.remove('d-none');
+  }
+});
+
+window.addEventListener('DOMContentLoaded', loadClients);
 </script>
 </body>
 </html>
+
+
 
 
 
