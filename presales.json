@@ -2,14 +2,18 @@
   "presales": [
     {
       "id": 1001,
-      "customer_id": 1,
-      "company": "IsaacsPOS Demo Store",
-      "cart": [
-        {"id": 1, "name": "Shampoo", "price": 49.99, "qty": 2}
+      "company_name": "Isaacs Beauty",
+      "external_source": "web-cart",
+      "machine_id": "POS-v1",
+      "customer_phone": "+27731234567",
+      "customer_name": "Lindiwe M",
+      "cart_json": [
+        { "id": 101, "name": "Shampoo 1L", "price": 89.5, "qty": 2 }
       ],
-      "total": 99.98,
-      "created_at": "2025-09-20T18:30:00Z",
-      "status": "pending"
+      "total": 179.00,
+      "status": "pending",
+      "created_at": "2025-08-02T10:20:00Z"
     }
   ]
 }
+
