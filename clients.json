@@ -1,14 +1,23 @@
 {
   "clients": [
     {
-      "id": 41,
-      "machine_id": null,
-      "name": "Mosadie Hair",
-      "email": null,
-      "phone": null,
-      "address": null,
+      "machine_id": "7ae628998054116b",
+      "name": "Isaacs Hair studio",
+      "email": "info@partners.online",
+      "phone": "27718831097",
+      "address": "53 Gie street",
       "status": "inactive",
-      "last_checkin": "2025-10-07T14:54:02.359836",
+      "token": null,
+      "created_at": "2025-10-07T15:00:05.072859"
+    },
+    {
+      "machine_id": "41",
+      "name": "Mosadie Hair",
+      "email": "",
+      "phone": "",
+      "address": "",
+      "status": "inactive",
+      "token": null,
       "created_at": "2024-11-12T09:00:00Z"
     }
   ]
