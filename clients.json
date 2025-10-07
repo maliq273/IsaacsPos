@@ -1,16 +1,18 @@
-{
-  "clients": [
-    {
-      "name": "Isaacs Beauty",
-      "location": "Cape Town",
-      "contact_phone": "+27730000001",
-      "created_at": "2024-10-01T07:00:00Z"
-    },
-    {
-      "name": "Mosadie Hair",
-      "location": "Johannesburg",
-      "contact_phone": "+27830000002",
-      "created_at": "2024-11-12T09:00:00Z"
-    }
-  ]
-}
+[
+  {
+    "machine_id": "ISAACS-001",
+    "name": "Isaacs Beauty",
+    "email": "isaacs@example.com",
+    "phone": "0712345678",
+    "address": "Cape Town",
+    "status": "active"
+  },
+  {
+    "machine_id": "MOSADIE-001",
+    "name": "Mosadie Hair",
+    "email": "mosadie@example.com",
+    "phone": "0787654321",
+    "address": "Durban",
+    "status": "active"
+  }
+]
