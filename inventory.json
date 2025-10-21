@@ -1,34 +1,22 @@
 {
   "products": [
     {
-      "id": 101,
       "company_name": "Isaacs Beauty",
       "name": "Shampoo 1L",
       "description": "Nourishing shampoo 1 litre",
       "price": 89.50,
       "quantity": 25,
       "type": "products",
-      "updated_at": "2025-08-01T08:00:00Z"
+      "updated_at": "2025-10-21T09:00:00Z"
     },
     {
-      "id": 102,
-      "company_name": "Isaacs Beauty",
-      "name": "Conditioner 500ml",
-      "description": "Hydrating conditioner",
-      "price": 64.00,
-      "quantity": 12,
-      "type": "products",
-      "updated_at": "2025-08-01T08:00:00Z"
-    },
-    {
-      "id": 201,
       "company_name": "Mosadie Hair",
       "name": "Hair Oil 100ml",
       "description": "Growth oil",
       "price": 120.00,
       "quantity": 40,
       "type": "products",
-      "updated_at": "2025-07-12T13:00:00Z"
+      "updated_at": "2025-10-21T09:00:00Z"
     }
   ]
 }
