@@ -8,7 +8,8 @@
       "address": "53 Gie street",
       "status": "active",
       "token": "9233ADE6B0D44C8C",
-      "created_at": "2025-10-07T15:00:05.072859"
+      "created_at": "2025-10-07T15:00:05.072859",
+      "last_seen": "2025-11-18T12:56:35.717557+00:00"
     },
     {
       "machine_id": "41",
