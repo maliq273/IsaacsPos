@@ -4,7 +4,7 @@
       "company_name": "Isaacs Beauty",
       "name": "Shampoo 1L",
       "description": "Nourishing shampoo 1 litre",
-      "price": 89.50,
+      "price": 89.5,
       "quantity": 25,
       "type": "products",
       "updated_at": "2025-10-21T09:00:00Z"
@@ -13,11 +13,18 @@
       "company_name": "Mosadie Hair",
       "name": "Hair Oil 100ml",
       "description": "Growth oil",
-      "price": 120.00,
+      "price": 120.0,
       "quantity": 40,
       "type": "products",
       "updated_at": "2025-10-21T09:00:00Z"
+    },
+    {
+      "company_name": "Default Company",
+      "name": "stephh",
+      "price": 20.0,
+      "quantity": 500,
+      "type": "products",
+      "updated_at": "2025-11-24T23:42:31.698331Z"
     }
   ]
 }
-
