@@ -8,12 +8,15 @@
   <style>
     body {
       margin: 0;
-      font-family: Segoe UI, Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       color: #1f2d3d;
-      height: 100vh;
+      min-height: 100vh;
       background: linear-gradient(-45deg, #a8edea, #fed6e3, #d4fc79, #96e6a1);
       background-size: 400% 400%;
-      animation: gradientBG 20s ease infinite;
+      animation: gradientBG 18s ease infinite;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
     @keyframes gradientBG {
       0% {background-position: 0% 50%;}
@@ -21,158 +24,233 @@
       100% {background-position: 0% 50%;}
     }
     .card {
-      border-radius: 16px;
+      border-radius: 14px;
       box-shadow: 0 10px 28px rgba(0,0,0,.12);
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(6px);
+      max-width:820px;
+      width:100%;
     }
     .small-muted { font-size:.9rem; color:#6c757d }
     h3, h5 { color:#174f33; }
     .btn-success { background:#28a745; border:none; }
     .btn-primary { background:#0077cc; border:none; }
+    .form-section { padding: 1rem 1.25rem; }
   </style>
 </head>
 <body>
 <div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-7">
-      <div class="card p-4">
-        <h3 class="mb-3">Welcome — Customer Portal</h3>
-        <p class="small-muted">Choose the company you're visiting, sign up or log in using phone + password.</p>
+    <div class="col-lg-9 col-md-10">
+      <div class="card">
+        <div class="form-section">
+          <h3 class="mb-1">Welcome — Customer Portal</h3>
+          <p class="small-muted mb-3">Choose the company you're visiting, sign up or log in using phone + password. Select a payment method at signup (cash or card).</p>
 
-        <!-- Company selector -->
-        <div class="mb-3">
-          <label class="form-label">Select company</label>
-          <select id="companySelect" class="form-select"></select>
+          <!-- Company selector -->
+          <div class="mb-3 row gx-2">
+            <div class="col-md-9">
+              <label class="form-label">Select company</label>
+              <select id="companySelect" class="form-select"></select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button id="refreshCompanies" class="btn btn-outline-secondary w-100">Refresh</button>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Signup -->
+          <h5>Sign up</h5>
+          <div id="signupAlert" class="alert d-none" role="alert"></div>
+          <div class="row g-2 mb-2">
+            <div class="col-md-6"><input id="signupName" class="form-control" placeholder="First name"></div>
+            <div class="col-md-6"><input id="signupSurname" class="form-control" placeholder="Surname"></div>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-md-6"><input id="signupPhone" class="form-control" placeholder="Phone (include country code, e.g. +27831234567)"></div>
+            <div class="col-md-6"><input id="signupPassword" class="form-control" type="password" placeholder="Password (min 6 chars)"></div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Preferred payment</label>
+              <select id="signupPayment" class="form-select">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+              </select>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <button id="btnSignup" class="btn btn-success w-100">Sign up & Notify</button>
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Login -->
+          <h5>Log in</h5>
+          <div id="loginAlert" class="alert d-none" role="alert"></div>
+          <div class="row g-2 mb-3">
+            <div class="col-md-6"><input id="loginPhone" class="form-control" placeholder="Phone"></div>
+            <div class="col-md-6"><input id="loginPassword" class="form-control" type="password" placeholder="Password"></div>
+          </div>
+          <div class="mb-3 d-flex gap-2">
+            <button id="btnLogin" class="btn btn-primary">Login</button>
+            <a id="cartLink" class="btn btn-outline-secondary" href="#" style="display:none">Go to Cart</a>
+          </div>
+
+          <hr />
+          <p class="small-muted">If your company isn't listed, contact the business so they can add it. The Hub will send a WhatsApp confirmation to new customers.</p>
         </div>
-
-        <hr />
-
-        <!-- Signup -->
-        <h5>Sign up</h5>
-        <div id="signupAlert" class="alert d-none"></div>
-        <div class="row g-2 mb-3">
-          <div class="col-md-6"><input id="signupName" class="form-control" placeholder="First name"></div>
-          <div class="col-md-6"><input id="signupSurname" class="form-control" placeholder="Surname"></div>
-          <div class="col-md-6"><input id="signupPhone" class="form-control" placeholder="Phone (include country code, e.g. +27...)"></div>
-          <div class="col-md-6"><input id="signupPassword" class="form-control" type="password" placeholder="Password"></div>
-        </div>
-        <div class="mb-3">
-          <button id="btnSignup" class="btn btn-success">Sign up</button>
-          <span class="small-muted ms-2">You'll receive your PIN/password via WhatsApp (Admin sends this).</span>
-        </div>
-
-        <hr />
-
-        <!-- Login -->
-        <h5>Log in</h5>
-        <div id="loginAlert" class="alert d-none"></div>
-        <div class="row g-2 mb-3">
-          <div class="col-md-6"><input id="loginPhone" class="form-control" placeholder="Phone"></div>
-          <div class="col-md-6"><input id="loginPassword" class="form-control" type="password" placeholder="Password"></div>
-        </div>
-        <div class="mb-3">
-          <button id="btnLogin" class="btn btn-primary">Login</button>
-          <a id="cartLink" class="btn btn-outline-secondary ms-2" href="#" style="display:none">Go to Cart</a>
-        </div>
-
-        <hr />
-        <p class="small-muted">If your company isn't listed, please contact the business so the Admin can register it.</p>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPOS/main';
-const ADMIN_BASE = location.origin; // assumes admin backend is same host
+/*
+  Upgraded customer landing page (Option A)
+  - Uses GitHub raw for companies/customers lists
+  - Calls /api/customer_signup on your Hub (same origin) to create customer and trigger company WhatsApp send
+  - Redirects to cart.html?company=...&phone=...&pay=...
+*/
 
+/* CONFIG */
+const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPOS/main';
+const ADMIN_BASE = window.location.origin; // Hub backend should live here and implement /api/customer_signup
+
+/* Small helpers */
+function el(id){ return document.getElementById(id); }
+function showAlert(node, kind, text){ node.className = 'alert alert-' + kind; node.textContent = text; node.classList.remove('d-none'); }
+function hide(node){ node.classList.add('d-none'); }
+
+/* SHA-256 hex (browser native) */
 async function sha256hex(message) {
   const msg = new TextEncoder().encode(message);
   const digest = await crypto.subtle.digest('SHA-256', msg);
   return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-/* Load companies */
-async function loadClients() {
-  const sel = document.getElementById('companySelect');
-  sel.innerHTML = '<option>Loading companies...</option>';
+/* Load companies from clients.json on GitHub */
+async function loadClients(){
+  const sel = el('companySelect');
+  sel.disabled = true;
+  sel.innerHTML = '<option>Loading companies…</option>';
   try {
     const r = await fetch(`${RAW_BASE}/clients.json`, {cache:'no-store'});
-    if (!r.ok) throw new Error(r.statusText);
+    if(!r.ok) throw new Error('Failed loading companies');
     const j = await r.json();
     sel.innerHTML = '';
-    for (const c of (j.clients || [])) {
+    const clients = (j && j.clients) ? j.clients.filter(c => c.active !== false) : [];
+    if(clients.length === 0){
+      sel.innerHTML = '<option>No companies available</option>';
+      return;
+    }
+    for(const c of clients){
       const opt = document.createElement('option');
       opt.value = c.name;
       opt.textContent = c.name + (c.location ? ' — ' + c.location : '');
+      // include dataset for easy access
+      if(c.whatsapp_number) opt.dataset.whatsapp = c.whatsapp_number;
       sel.appendChild(opt);
     }
-  } catch (e) {
+  } catch(e){
     sel.innerHTML = '<option>Error loading companies</option>';
     console.error(e);
+  } finally {
+    sel.disabled = false;
   }
 }
 
-/* Signup */
-document.getElementById('btnSignup').addEventListener('click', async ()=>{
-  const name = signupName.value.trim();
-  const surname = signupSurname.value.trim();
-  const phone = signupPhone.value.trim();
-  const password = signupPassword.value;
-  const alert = signupAlert;
-  alert.classList.add('d-none');
+/* Signup handler */
+el('btnSignup').addEventListener('click', async ()=>{
+  hide(el('signupAlert'));
+  const name = el('signupName').value.trim();
+  const surname = el('signupSurname').value.trim();
+  const phone = el('signupPhone').value.trim();
+  const password = el('signupPassword').value;
+  const payment = el('signupPayment').value || 'cash';
+  const company = el('companySelect').value;
 
-  if (!name || !phone || !password) {
-    alert.className='alert alert-danger'; alert.textContent='Name, phone and password are required.'; alert.classList.remove('d-none'); return;
+  if(!name || !phone || !password || !company){
+    showAlert(el('signupAlert'),'danger','Please fill name, phone, password and choose company.');
+    return;
   }
-  const company = companySelect.value;
-  const pw_hash = await sha256hex(password);
+  if(password.length < 6){ showAlert(el('signupAlert'),'danger','Password must be at least 6 characters.'); return; }
 
   try {
+    const pw_hash = await sha256hex(password);
+    const payload = { company_name: company, name, surname, phone, password_hash: pw_hash, preferred_payment: payment };
+
+    // Call Hub backend to create customer and send WhatsApp from company's number
     const resp = await fetch(`${ADMIN_BASE}/api/customer_signup`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({company_name:company, name, surname, phone, password_hash:pw_hash})
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      credentials: 'include'
     });
-    const data = await resp.json();
-    if (resp.ok && data.ok) {
-      alert.className='alert alert-success'; alert.textContent='Signup successful — you will receive instructions via WhatsApp shortly.'; alert.classList.remove('d-none');
-      cartLink.style.display='inline-block';
-      cartLink.href=`cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}`;
+
+    const body = await resp.json().catch(()=>({ ok:false, error: 'Invalid response' }));
+
+    if(resp.ok && body && body.ok){
+      showAlert(el('signupAlert'),'success','Signup successful — you will receive confirmation via WhatsApp shortly.');
+      // show cart link with payment and phone
+      el('cartLink').style.display = 'inline-block';
+      el('cartLink').href = `cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}&pay=${encodeURIComponent(payment)}`;
     } else {
-      alert.className='alert alert-danger'; alert.textContent=(data && data.error)?data.error:'Signup failed.'; alert.classList.remove('d-none');
+      const err = (body && body.error) ? body.error : `Signup failed (${resp.status})`;
+      showAlert(el('signupAlert'),'danger', err);
     }
-  } catch(e) {
-    alert.className='alert alert-danger'; alert.textContent='Network error signing up.'; alert.classList.remove('d-none'); console.error(e);
+  } catch(e){
+    console.error(e);
+    showAlert(el('signupAlert'),'danger','Network error when signing up.');
   }
 });
 
-/* Login */
-document.getElementById('btnLogin').addEventListener('click', async ()=>{
-  const phone = loginPhone.value.trim();
-  const password = loginPassword.value;
-  const alert = loginAlert;
-  alert.classList.add('d-none');
-  if (!phone || !password) { alert.className='alert alert-danger'; alert.textContent='Phone and password required.'; alert.classList.remove('d-none'); return; }
-  const company = companySelect.value;
+/* Login handler */
+el('btnLogin').addEventListener('click', async ()=>{
+  hide(el('loginAlert'));
+  const phone = el('loginPhone').value.trim();
+  const password = el('loginPassword').value;
+  const company = el('companySelect').value;
+
+  if(!phone || !password || !company){
+    showAlert(el('loginAlert'),'danger','Phone, password and company required.');
+    return;
+  }
+
   try {
     const r = await fetch(`${RAW_BASE}/customers.json`, {cache:'no-store'});
-    if (!r.ok) throw new Error('Could not load customers list');
+    if(!r.ok) throw new Error('Could not load customers');
     const customers = (await r.json()).customers || [];
-    const match = customers.find(c => c.company_name===company && c.phone===phone);
-    if (!match) { alert.className='alert alert-danger'; alert.textContent='Customer not found for this company.'; alert.classList.remove('d-none'); return; }
+
+    const match = customers.find(c => (c.company_name === company && c.phone === phone));
+    if(!match){ showAlert(el('loginAlert'),'danger','Customer not found for this company.'); return; }
+
     const hashed = await sha256hex(password);
-    if (hashed===match.password_hash) {
-      alert.className='alert alert-success'; alert.textContent='Login OK. Redirecting...'; alert.classList.remove('d-none');
-      setTimeout(()=> window.location.href=`cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}`, 700);
-    } else { alert.className='alert alert-danger'; alert.textContent='Invalid credentials.'; alert.classList.remove('d-none'); }
-  } catch(e) { console.error(e); alert.className='alert alert-danger'; alert.textContent='Network error during login.'; alert.classList.remove('d-none'); }
+    if(hashed === match.password_hash){
+      showAlert(el('loginAlert'),'success','Login OK. Redirecting to cart...');
+      // include possible stored preferred_payment or allow customer choose on cart
+      const pay = match.preferred_payment || 'cash';
+      setTimeout(()=> window.location.href = `cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}&pay=${encodeURIComponent(pay)}`, 600);
+    } else {
+      showAlert(el('loginAlert'),'danger','Invalid credentials.');
+    }
+  } catch(e){
+    console.error(e);
+    showAlert(el('loginAlert'),'danger','Network error during login.');
+  }
 });
 
+/* refresh companies button */
+el('refreshCompanies').addEventListener('click', loadClients);
+
+/* initial load */
 window.addEventListener('DOMContentLoaded', loadClients);
 </script>
 </body>
 </html>
+
 
 
 
