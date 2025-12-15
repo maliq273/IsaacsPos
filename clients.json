@@ -1,16 +1,44 @@
 {
+  "schema_version": "2.0",
   "clients": [
     {
       "machine_id": "7ae628998054116b",
-      "name": "Isaacs Hair studio",
+      "name": "Isaacs Hair Studio",
       "email": "info@partners.online",
       "phone": "27718831097",
-      "address": "53 Gie street",
+      "address": "53 Gie Street",
       "status": "active",
       "token": "190E66D2CEFA45F4",
       "created_at": "2025-10-07T15:00:05.072859",
-      "last_seen": "2025-12-11T10:25:48.275314+00:00"
+      "last_seen": "2025-12-11T10:25:48.275314+00:00",
+
+      "company": {
+        "registration_number": "2019/123456/07",
+        "contact_person": "Maaliek Isaacs"
+      },
+
+      "apps": {
+        "isaacspos": {
+          "enabled": true,
+          "license": "POS-PRO",
+          "expires_on": null
+        },
+        "salonsync": {
+          "enabled": true,
+          "plan": "standard",
+          "expires_on": null
+        }
+      },
+
+      "features": {
+        "pos": true,
+        "bookings": true,
+        "whatsapp": true,
+        "reports": true,
+        "cloud_sync": true
+      }
     },
+
     {
       "machine_id": "41",
       "name": "Mosadie Hair",
@@ -19,7 +47,27 @@
       "address": "",
       "status": "inactive",
       "token": null,
-      "created_at": "2024-11-12T09:00:00Z"
+      "created_at": "2024-11-12T09:00:00Z",
+
+      "company": {
+        "registration_number": null,
+        "contact_person": null
+      },
+
+      "apps": {
+        "isaacspos": {
+          "enabled": false,
+          "license": null,
+          "expires_on": null
+        },
+        "salonsync": {
+          "enabled": false,
+          "plan": null,
+          "expires_on": null
+        }
+      },
+
+      "features": {}
     }
   ]
 }
