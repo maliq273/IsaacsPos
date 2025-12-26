@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>IsaacsPOS — Selection Menu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #022c22; color: #fff; }
+    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col p-4">
+    <header class="flex justify-between items-center py-6 px-4 shrink-0">
+        <div>
+            <h1 id="salonName" class="text-xl font-black uppercase tracking-tight">Salon Menu</h1>
+            <p class="text-emerald-500/50 text-[9px] font-bold uppercase tracking-widest">Mobile Catalog</p>
+        </div>
+        <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-emerald-950">I</div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto no-scrollbar space-y-6 pb-40">
+        <div id="catalogGrid" class="grid grid-cols-2 gap-4">
+            <div class="col-span-2 py-20 text-center opacity-20">
+                <p class="text-xs font-bold uppercase tracking-widest">Fetching Salon Inventory...</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="cartBar" class="fixed bottom-10 left-4 right-4 glass rounded-[2.5rem] p-6 shadow-2xl flex items-center justify-between transform translate-y-40 transition-transform duration-500">
+        <div>
+            <p id="cartCount" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">0 Items Selected</p>
+            <p id="cartTotal" class="text-2xl font-black text-white">R0.00</p>
+        </div>
+        <button id="btnCheckout" class="bg-emerald-500 text-emerald-950 px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all">
+            Send to Counter
+        </button>
+    </div>
+
+    <script>
+        const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPos/main';
+        const params = new URLSearchParams(window.location.search);
+        const mid = params.get('ref');
+        const phone = params.get('phone');
+        const cname = params.get('name');
+
+        let products = [];
+        let cart = [];
+
+        async function init() {
+            const rInfo = await fetch(`${RAW_BASE}/company_info.json`);
+            const salons = await rInfo.json();
+            const salon = salons.find(s => s.machine_id === mid);
+            if (salon) document.getElementById('salonName').textContent = salon.company;
+
+            const rProd = await fetch(`${RAW_BASE}/data/products.json?t=${Date.now()}`);
+            const prodData = await rProd.json();
+            products = prodData.products || [];
+            renderCatalog();
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = products.map(p => `
+                <div onclick="addToCart(${p.id})" class="glass rounded-3xl p-5 flex flex-col justify-between h-40 active:scale-95 transition-all cursor-pointer">
+                    <div>
+                        <span class="text-[8px] font-black text-emerald-500 uppercase tracking-widest">${p.category}</span>
+                        <h3 class="font-bold text-[11px] leading-tight mt-1 line-clamp-2">${p.name}</h3>
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <span class="font-black text-lg">R${p.price.toFixed(0)}</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 font-black">+</div>
+                    </div>
+                </div>
+            `).join('') || '<p class="col-span-2 text-center opacity-30 py-10 uppercase text-[10px] font-black">Menu Unavailable</p>';
+        }
+
+        window.addToCart = (id) => {
+            const p = products.find(x => x.id === id);
+            cart.push(p);
+            const bar = document.getElementById('cartBar');
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            document.getElementById('cartCount').textContent = `${cart.length} Items Selected`;
+            document.getElementById('cartTotal').textContent = `R${total.toFixed(2)}`;
+            bar.classList.remove('translate-y-40');
+        };
+
+        document.getElementById('btnCheckout').onclick = () => {
+            alert(`Thanks ${cname}! Your selection has been pushed to the Cloud Queue. Please approach the stylist.`);
+            window.location.href = "index.html";
+        };
+
+        init();
+    </script>
+</body>
+</html>
