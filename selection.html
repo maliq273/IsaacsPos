@@ -134,7 +134,7 @@
                     subtotal: i.price 
                 })),
                 total: cart.reduce((s, i) => s + i.price, 0),
-                payment_intent: 'CASH', // Paying counter cash/card
+                payment_intent: 'CASH', 
                 created_at: new Date().toISOString(),
                 source: 'QR'
             };
@@ -158,10 +158,11 @@
                     alert(`Success! Your selection is in the queue. Please visit the counter to finalize.`);
                     window.location.href = "index.html";
                 } else {
-                    throw new Error("Push failed");
+                    const err = await res.json();
+                    throw new Error(err.message || "Push failed");
                 }
             } catch (e) {
-                alert("Queue Sync Error. Please notify your stylist.");
+                alert("Queue Error: " + e.message);
             } finally {
                 btn.textContent = "CHECKOUT";
                 btn.disabled = false;
