@@ -16,5 +16,14 @@
     "status": "inactive",
     "token": null,
     "system_type": "IsaacsPOS"
+  },
+  {
+    "machine_id": "36230C99EF76",
+    "company": "Mosadie hair",
+    "phone": "27718831097",
+    "address": "Gie Road, Tableview",
+    "status": "active",
+    "token": "ISAACS-336B9C74",
+    "system_type": "IsaacsPOS"
   }
 ]
