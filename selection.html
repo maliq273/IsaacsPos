@@ -7,51 +7,51 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
-    .header-sage { background: #059669; }
-    .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(5, 150, 105, 0.1); }
+    body { font-family: 'Inter', sans-serif; background-color: #f0fdfa; color: #0f172a; }
+    .header-mint { background: #14b8a6; }
+    .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(20, 184, 166, 0.1); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
-    .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .product-card:active { transform: scale(0.95); background: #ecfdf5; }
-    .cart-anim { animation: slideIn 0.5s forwards; }
+    .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white; border: 1px solid #f1f5f9; }
+    .product-card:active { transform: scale(0.95); background: #f0fdf4; border-color: #14b8a6; }
+    .cart-anim { animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#f0fdf4]">
+<body class="min-h-screen flex flex-col">
     
     <!-- Header -->
-    <header class="header-sage pt-12 pb-8 px-6 text-white rounded-b-[3rem] shadow-xl shrink-0">
+    <header class="header-mint pt-12 pb-10 px-6 text-white rounded-b-[3.5rem] shadow-2xl shrink-0">
         <div class="flex justify-between items-start">
             <div>
-                <h1 id="salonName" class="text-2xl font-black uppercase tracking-tight">Salon Menu</h1>
-                <p id="userNameDisplay" class="text-emerald-100 text-[10px] font-bold uppercase tracking-widest mt-1">Guest Selection</p>
+                <h1 id="salonName" class="text-2xl font-black uppercase tracking-tight">Salon Catalog</h1>
+                <p id="userNameDisplay" class="text-teal-100 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">Guest Selection</p>
             </div>
-            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-black text-emerald-950 shadow-lg">I</div>
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-black text-teal-950 shadow-lg">I</div>
         </div>
     </header>
 
     <!-- Catalog -->
-    <main class="flex-1 overflow-y-auto no-scrollbar px-6 py-10 space-y-6">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="font-black text-emerald-900 uppercase text-xs tracking-widest">Available Treatments</h3>
-            <span class="text-[9px] font-bold text-emerald-500 bg-white px-3 py-1 rounded-full border border-emerald-50 uppercase">Synced Live</span>
+    <main class="flex-1 overflow-y-auto no-scrollbar px-6 py-12 space-y-8">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-black text-slate-900 uppercase text-xs tracking-[0.2em]">Service Menu</h3>
+            <span class="text-[9px] font-black text-teal-600 bg-white px-3 py-1.5 rounded-full border border-teal-50 uppercase tracking-widest shadow-sm">Syncing Live</span>
         </div>
+        
         <div id="catalogGrid" class="grid grid-cols-2 gap-4">
-            <!-- Items Injected -->
             <div class="col-span-2 text-center py-20 opacity-20">
-                <p class="text-xs font-bold uppercase tracking-widest">Loading Catalog...</p>
+                <p class="text-xs font-bold uppercase tracking-widest">Loading Items...</p>
             </div>
         </div>
-        <div class="h-32"></div> <!-- Spacer for cart -->
+        <div class="h-40"></div>
     </main>
 
     <!-- Floating Checkout Bar -->
-    <div id="cartBar" class="fixed bottom-10 left-6 right-6 glass rounded-[2.5rem] p-6 shadow-2xl flex items-center justify-between hidden cart-anim border-2 border-white">
+    <div id="cartBar" class="fixed bottom-10 left-6 right-6 glass rounded-[2.5rem] p-6 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.1)] flex items-center justify-between hidden cart-anim border-2 border-white">
         <div>
-            <p id="cartCount" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">0 Items Selected</p>
-            <p id="cartTotal" class="text-3xl font-black text-emerald-950">R0.00</p>
+            <p id="cartCount" class="text-[9px] font-black text-teal-500 uppercase tracking-widest">0 Items Selected</p>
+            <p id="cartTotal" class="text-3xl font-black text-slate-900">R0.00</p>
         </div>
-        <button id="btnPush" class="bg-emerald-950 text-white px-8 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all">
+        <button id="btnPush" class="bg-slate-900 text-white px-10 py-5 rounded-3xl font-black uppercase text-[11px] tracking-widest shadow-xl active:scale-95 transition-all">
             Join Queue
         </button>
     </div>
@@ -60,8 +60,8 @@
         const GITHUB_TOKEN = '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';
         const GITHUB_OWNER = 'maliq273';
         const GITHUB_REPO = 'IsaacsPos';
-        const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`;
         const API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
+        const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`;
 
         const params = new URLSearchParams(window.location.search);
         const mid = params.get('ref');
@@ -73,53 +73,46 @@
 
         async function init() {
             document.getElementById('userNameDisplay').textContent = cname ? cname.toUpperCase() : 'GUEST';
-            
             try {
-                // 1. Get Salon Name
-                const salons = await (await fetch(`${RAW_BASE}/company_info.json`)).json();
+                const salons = await (await fetch(`${RAW_BASE}/company_info.json?t=${Date.now()}`)).json();
                 const salon = salons.find(s => s.machine_id === mid);
                 if (salon) document.getElementById('salonName').textContent = salon.company;
 
-                // 2. Load Inventory
                 const pData = await (await fetch(`${RAW_BASE}/data/products.json?t=${Date.now()}`)).json();
                 products = pData.products || [];
                 renderCatalog();
-            } catch (e) {
-                alert("Error connecting to Salon Cloud.");
-            }
+            } catch (e) { console.error("Sync Error", e); }
         }
 
         function renderCatalog() {
             const grid = document.getElementById('catalogGrid');
             grid.innerHTML = products.length ? products.map(p => `
-                <div onclick="addToCart(${p.id})" class="bg-white rounded-[2rem] p-5 flex flex-col justify-between h-44 shadow-sm border border-emerald-50 product-card cursor-pointer">
+                <div onclick="addToCart(${p.id})" class="product-card rounded-[2.5rem] p-5 flex flex-col justify-between h-48 shadow-sm cursor-pointer">
                     <div>
-                        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-widest">${p.category}</span>
-                        <h3 class="font-black text-emerald-950 text-xs leading-tight mt-1 line-clamp-2">${p.name}</h3>
+                        <span class="text-[8px] font-black text-teal-400 uppercase tracking-widest">${p.category}</span>
+                        <h3 class="font-black text-slate-900 text-xs leading-tight mt-1 line-clamp-3 uppercase tracking-tight">${p.name}</h3>
                     </div>
                     <div class="flex justify-between items-end">
-                        <span class="font-black text-xl text-emerald-900">R${p.price.toFixed(0)}</span>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-2xl font-black">+</div>
+                        <span class="font-black text-xl text-slate-900">R${p.price.toFixed(0)}</span>
+                        <div class="w-10 h-10 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600 text-2xl font-black">+</div>
                     </div>
                 </div>
-            `).join('') : '<p class="col-span-2 text-center text-emerald-300 font-black uppercase text-[10px] py-10">No Services Online</p>';
+            `).join('') : '<p class="col-span-2 text-center text-slate-300 font-black uppercase text-[10px] py-20">Catalog Unavailable</p>';
         }
 
         window.addToCart = (id) => {
             const p = products.find(x => x.id === id);
             cart.push(p);
-            
             const bar = document.getElementById('cartBar');
             const total = cart.reduce((s, i) => s + i.price, 0);
-            
-            document.getElementById('cartCount').textContent = `${cart.length} Item${cart.length > 1 ? 's' : ''} Selected`;
+            document.getElementById('cartCount').textContent = `${cart.length} Treatment${cart.length > 1 ? 's' : ''}`;
             document.getElementById('cartTotal').textContent = `R${total.toFixed(2)}`;
             bar.classList.remove('hidden');
         };
 
         document.getElementById('btnPush').onclick = async () => {
             const btn = document.getElementById('btnPush');
-            btn.textContent = "SYNCING...";
+            btn.textContent = "JOINING...";
             btn.disabled = true;
 
             const orderId = Math.random().toString(36).substr(2, 9).toUpperCase();
@@ -141,7 +134,7 @@
             };
 
             try {
-                // In IsaacsPOS, the POS polls for files in /orders/[mid]/
+                // IMPORTANT: The path must be exactly /orders/[machine_id]/order_[id].json
                 const path = `/contents/orders/${mid}/order_${orderId}.json`;
                 const res = await fetch(`${API_BASE}${path}`, {
                     method: 'PUT',
@@ -151,8 +144,8 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: `Mobile Order: ${cname} (${orderId})`,
-                        content: btoa(JSON.stringify(payload, null, 2))
+                        message: `Mobile Queue: ${cname} (${orderId})`,
+                        content: window.btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))))
                     })
                 });
 
@@ -160,7 +153,7 @@
                     alert(`Folio successfully pushed to Salon Queue! Please approach the counter to finalize.`);
                     window.location.href = "index.html";
                 } else {
-                    throw new Error("Push Failed");
+                    throw new Error("GitHub rejected push.");
                 }
             } catch (e) {
                 alert("Queue Sync Error. Please show your cart to the stylist.");
