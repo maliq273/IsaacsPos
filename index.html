@@ -2,254 +2,212 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>IsaacsPOS — Customer Portal</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      color: #1f2d3d;
-      min-height: 100vh;
-      background: linear-gradient(-45deg, #a8edea, #fed6e3, #d4fc79, #96e6a1);
-      background-size: 400% 400%;
-      animation: gradientBG 18s ease infinite;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    @keyframes gradientBG {
-      0% {background-position: 0% 50%;}
-      50% {background-position: 100% 50%;}
-      100% {background-position: 0% 50%;}
-    }
-    .card {
-      border-radius: 14px;
-      box-shadow: 0 10px 28px rgba(0,0,0,.12);
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(6px);
-      max-width:820px;
-      width:100%;
-    }
-    .small-muted { font-size:.9rem; color:#6c757d }
-    h3, h5 { color:#174f33; }
-    .btn-success { background:#28a745; border:none; }
-    .btn-primary { background:#0077cc; border:none; }
-    .form-section { padding: 1rem 1.25rem; }
+    body { font-family: 'Inter', sans-serif; background: #022c22; color: #fff; overflow-x: hidden; }
+    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .emerald-glow { box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.3); }
+    input, select { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: white !important; font-weight: 700; }
+    input::placeholder { color: rgba(255, 255, 255, 0.2); }
+    .floating-banner { animation: float 6s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0) translateX(-50%); } 50% { transform: translateY(-10px) translateX(-50%); } }
+    .loading-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #10b981; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
+<script type="importmap">
+{
+  "imports": {
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "path": "https://esm.sh/path@^0.12.7",
+    "url": "https://esm.sh/url@^0.11.4",
+    "react": "https://esm.sh/react@^19.2.3",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "electron": "https://esm.sh/electron@^39.2.7",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
+    "dotenv": "https://esm.sh/dotenv@^17.2.3",
+    "qrcode.react": "https://esm.sh/qrcode.react@^4.2.0",
+    "@capacitor/cli": "https://esm.sh/@capacitor/cli@^8.0.0",
+    "dexie": "https://esm.sh/dexie@^4.2.1"
+  }
+}
+</script>
 </head>
-<body>
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-9 col-md-10">
-      <div class="card">
-        <div class="form-section">
-          <h3 class="mb-1">Welcome — Customer Portal</h3>
-          <p class="small-muted mb-3">Choose the company you're visiting, sign up or log in using phone + password. Select a payment method at signup (cash or card).</p>
+<body class="min-h-screen flex items-center justify-center p-4">
+  <div class="fixed -top-24 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+  <div class="fixed -bottom-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
 
-          <!-- Company selector -->
-          <div class="mb-3 row gx-2">
-            <div class="col-md-9">
-              <label class="form-label">Select company</label>
-              <select id="companySelect" class="form-select"></select>
-            </div>
-            <div class="col-md-3 d-flex align-items-end">
-              <button id="refreshCompanies" class="btn btn-outline-secondary w-100">Refresh</button>
-            </div>
+  <div class="w-full max-w-lg z-10 py-10">
+    <div class="text-center mb-10">
+      <div class="w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center shadow-2xl mx-auto mb-6 rotate-3">
+        <span class="text-5xl font-black text-emerald-950">I</span>
+      </div>
+      <h1 class="text-3xl font-black tracking-tighter uppercase mb-2">IsaacsPOS Portal</h1>
+      <p class="text-emerald-400/60 text-[10px] font-black uppercase tracking-[0.3em]">Boutique Self-Service Experience</p>
+    </div>
+
+    <div id="mainView" class="glass rounded-[3rem] p-8 md:p-12 emerald-glow space-y-8">
+      <div class="space-y-3">
+        <label class="text-[10px] font-black text-emerald-500 uppercase tracking-widest ml-1">Visiting Salon</label>
+        <select id="companySelect" class="w-full p-5 rounded-2xl outline-none text-sm appearance-none cursor-pointer"></select>
+      </div>
+
+      <div id="tabGroup" class="flex bg-white/5 rounded-2xl p-1.5">
+        <button id="tabLogin" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all bg-emerald-500 text-emerald-950 shadow-lg">Login</button>
+        <button id="tabSignup" class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-emerald-400">Join Club</button>
+      </div>
+
+      <div id="authSection" class="space-y-6">
+        <div id="loginForm" class="space-y-4">
+          <div class="space-y-2">
+            <label class="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest ml-1">Cellphone Number (Password)</label>
+            <input id="loginPhone" type="tel" placeholder="+27 83 123 4567" class="w-full p-5 rounded-2xl outline-none text-lg tracking-widest font-mono">
           </div>
-
-          <hr />
-
-          <!-- Signup -->
-          <h5>Sign up</h5>
-          <div id="signupAlert" class="alert d-none" role="alert"></div>
-          <div class="row g-2 mb-2">
-            <div class="col-md-6"><input id="signupName" class="form-control" placeholder="First name"></div>
-            <div class="col-md-6"><input id="signupSurname" class="form-control" placeholder="Surname"></div>
-          </div>
-          <div class="row g-2 mb-2">
-            <div class="col-md-6"><input id="signupPhone" class="form-control" placeholder="Phone (include country code, e.g. +27831234567)"></div>
-            <div class="col-md-6"><input id="signupPassword" class="form-control" type="password" placeholder="Password (min 6 chars)"></div>
-          </div>
-
-          <div class="row g-2 mb-3">
-            <div class="col-md-6">
-              <label class="form-label">Preferred payment</label>
-              <select id="signupPayment" class="form-select">
-                <option value="cash">Cash</option>
-                <option value="card">Card</option>
-              </select>
-            </div>
-            <div class="col-md-6 d-flex align-items-end">
-              <button id="btnSignup" class="btn btn-success w-100">Sign up & Notify</button>
-            </div>
-          </div>
-
-          <hr />
-
-          <!-- Login -->
-          <h5>Log in</h5>
-          <div id="loginAlert" class="alert d-none" role="alert"></div>
-          <div class="row g-2 mb-3">
-            <div class="col-md-6"><input id="loginPhone" class="form-control" placeholder="Phone"></div>
-            <div class="col-md-6"><input id="loginPassword" class="form-control" type="password" placeholder="Password"></div>
-          </div>
-          <div class="mb-3 d-flex gap-2">
-            <button id="btnLogin" class="btn btn-primary">Login</button>
-            <a id="cartLink" class="btn btn-outline-secondary" href="#" style="display:none">Go to Cart</a>
-          </div>
-
-          <hr />
-          <p class="small-muted">If your company isn't listed, contact the business so they can add it. The Hub will send a WhatsApp confirmation to new customers.</p>
+          <button id="btnLogin" class="w-full bg-emerald-500 text-emerald-950 font-black py-5 rounded-2xl uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
+            <span id="loginText">Access Folio</span>
+            <div id="loginLoading" class="loading-spinner hidden"></div>
+          </button>
         </div>
+
+        <div id="signupForm" class="hidden space-y-4">
+          <div class="grid grid-cols-2 gap-4">
+            <input id="signupName" placeholder="FIRST NAME" class="w-full p-5 rounded-2xl outline-none text-xs uppercase">
+            <input id="signupSurname" placeholder="SURNAME" class="w-full p-5 rounded-2xl outline-none text-xs uppercase">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[9px] font-bold text-emerald-500/50 ml-1 uppercase">Cell (+27 Default)</label>
+            <input id="signupPhone" type="tel" value="+27" class="w-full p-5 rounded-2xl outline-none text-lg tracking-widest font-mono">
+          </div>
+          <button id="btnSignup" class="w-full bg-emerald-500 text-emerald-950 font-black py-5 rounded-2xl uppercase tracking-widest text-xs shadow-xl active:scale-95 transition-all">Register & Join Club</button>
+        </div>
+      </div>
+
+      <div id="userInfo" class="hidden space-y-6 animate-in fade-in duration-500">
+        <div class="text-center">
+            <h2 id="welcomeName" class="text-2xl font-black uppercase tracking-tight mb-2">Hello, Client</h2>
+            <p class="text-emerald-400/50 text-[10px] font-bold uppercase tracking-widest">Active Membership Profile</p>
+        </div>
+        <div class="bg-emerald-500/10 border border-emerald-500/20 p-8 rounded-[2rem] text-center space-y-4">
+          <div class="flex justify-around items-center">
+            <div>
+              <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Wallet Credits</p>
+              <p id="userWallet" class="text-3xl font-black text-white mt-1">R0.00</p>
+            </div>
+            <div class="w-px h-10 bg-emerald-500/20"></div>
+            <div>
+              <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Loyalty Points</p>
+              <p id="userLoyalty" class="text-3xl font-black text-white mt-1">0</p>
+            </div>
+          </div>
+        </div>
+        <button id="btnSelection" class="w-full bg-white text-black font-black py-6 rounded-[2rem] uppercase tracking-widest text-xs shadow-2xl flex items-center justify-center gap-3 active:scale-95 transition-all group">
+          Browse Catalog <span class="text-emerald-600 group-hover:translate-x-2 transition-transform">→</span>
+        </button>
+        <button id="btnLogout" class="w-full text-emerald-500/30 font-black text-[9px] uppercase tracking-widest">Switch Account</button>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-/*
-  Upgraded customer landing page (Option A)
-  - Uses GitHub raw for companies/customers lists
-  - Calls /api/customer_signup on your Hub (same origin) to create customer and trigger company WhatsApp send
-  - Redirects to cart.html?company=...&phone=...&pay=...
-*/
+  <div class="fixed bottom-8 left-1/2 -translate-x-1/2 floating-banner z-50">
+    <div class="bg-emerald-950/90 backdrop-blur-md text-emerald-400 px-8 py-3 rounded-full border border-emerald-500/30 shadow-2xl whitespace-nowrap">
+      <span class="text-[9px] font-black uppercase tracking-[0.2em]">Powered by Isaacs and Partners pty(Ltd)</span>
+    </div>
+  </div>
 
-/* CONFIG */
-const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPOS/main';
-const ADMIN_BASE = window.location.origin; // Hub backend should live here and implement /api/customer_signup
+  <script>
+    const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPOS/main';
+    let currentCustomer = null;
 
-/* Small helpers */
-function el(id){ return document.getElementById(id); }
-function showAlert(node, kind, text){ node.className = 'alert alert-' + kind; node.textContent = text; node.classList.remove('d-none'); }
-function hide(node){ node.classList.add('d-none'); }
+    const tabLogin = document.getElementById('tabLogin');
+    const tabSignup = document.getElementById('tabSignup');
+    const loginForm = document.getElementById('loginForm');
+    const signupForm = document.getElementById('signupForm');
 
-/* SHA-256 hex (browser native) */
-async function sha256hex(message) {
-  const msg = new TextEncoder().encode(message);
-  const digest = await crypto.subtle.digest('SHA-256', msg);
-  return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
+    tabLogin.onclick = () => {
+      tabLogin.className = 'flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500 text-emerald-950 shadow-lg';
+      tabSignup.className = 'flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-emerald-400';
+      loginForm.classList.remove('hidden');
+      signupForm.classList.add('hidden');
+    };
 
-/* Load companies from clients.json on GitHub */
-async function loadClients(){
-  const sel = el('companySelect');
-  sel.disabled = true;
-  sel.innerHTML = '<option>Loading companies…</option>';
-  try {
-    const r = await fetch(`${RAW_BASE}/clients.json`, {cache:'no-store'});
-    if(!r.ok) throw new Error('Failed loading companies');
-    const j = await r.json();
-    sel.innerHTML = '';
-    const clients = (j && j.clients) ? j.clients.filter(c => c.active !== false) : [];
-    if(clients.length === 0){
-      sel.innerHTML = '<option>No companies available</option>';
-      return;
+    tabSignup.onclick = () => {
+      tabSignup.className = 'flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-500 text-emerald-950 shadow-lg';
+      tabLogin.className = 'flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-emerald-400';
+      signupForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+    };
+
+    async function loadCompanies() {
+      const select = document.getElementById('companySelect');
+      try {
+        const r = await fetch(`${RAW_BASE}/company_info.json?t=${Date.now()}`);
+        const data = await r.json();
+        select.innerHTML = '';
+        data.filter(c => c.status === 'active').forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.machine_id;
+          opt.textContent = c.company.toUpperCase();
+          select.appendChild(opt);
+        });
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('ref')) select.value = params.get('ref');
+      } catch (e) {
+        select.innerHTML = '<option>Cloud Connection Offline</option>';
+      }
     }
-    for(const c of clients){
-      const opt = document.createElement('option');
-      opt.value = c.name;
-      opt.textContent = c.name + (c.location ? ' — ' + c.location : '');
-      // include dataset for easy access
-      if(c.whatsapp_number) opt.dataset.whatsapp = c.whatsapp_number;
-      sel.appendChild(opt);
+
+    document.getElementById('btnLogin').onclick = async () => {
+      const phone = document.getElementById('loginPhone').value.trim();
+      if (!phone) return alert("Enter your cellphone number.");
+      document.getElementById('loginLoading').classList.remove('hidden');
+      try {
+        const r = await fetch(`${RAW_BASE}/customers.json?t=${Date.now()}`);
+        const data = await r.json();
+        const customer = (data.customers || []).find(c => c.phone === phone);
+        if (customer) showDashboard(customer);
+        else alert("Member not found. Please join the club!");
+      } finally {
+        document.getElementById('loginLoading').classList.add('hidden');
+      }
+    };
+
+    document.getElementById('btnSignup').onclick = async () => {
+      const n = document.getElementById('signupName').value.trim();
+      const s = document.getElementById('signupSurname').value.trim();
+      const p = document.getElementById('signupPhone').value.trim();
+      if (!n || !s || p.length < 10) return alert("Please fill in all details correctly.");
+      
+      const newCust = { name: `${n} ${s}`, phone: p, wallet_balance: 0, loyalty_points: 0 };
+      showDashboard(newCust);
+    };
+
+    function showDashboard(customer) {
+      currentCustomer = customer;
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('tabGroup').classList.add('hidden');
+      document.getElementById('userInfo').classList.remove('hidden');
+      document.getElementById('welcomeName').textContent = `Hello, ${customer.name.split(' ')[0]}`;
+      document.getElementById('userWallet').textContent = `R${(customer.wallet_balance || 0).toFixed(2)}`;
+      document.getElementById('userLoyalty').textContent = customer.loyalty_points || 0;
     }
-  } catch(e){
-    sel.innerHTML = '<option>Error loading companies</option>';
-    console.error(e);
-  } finally {
-    sel.disabled = false;
-  }
-}
 
-/* Signup handler */
-el('btnSignup').addEventListener('click', async ()=>{
-  hide(el('signupAlert'));
-  const name = el('signupName').value.trim();
-  const surname = el('signupSurname').value.trim();
-  const phone = el('signupPhone').value.trim();
-  const password = el('signupPassword').value;
-  const payment = el('signupPayment').value || 'cash';
-  const company = el('companySelect').value;
+    document.getElementById('btnSelection').onclick = () => {
+      const mid = document.getElementById('companySelect').value;
+      window.location.href = `selection.html?ref=${mid}&phone=${currentCustomer.phone}&name=${encodeURIComponent(currentCustomer.name)}`;
+    };
 
-  if(!name || !phone || !password || !company){
-    showAlert(el('signupAlert'),'danger','Please fill name, phone, password and choose company.');
-    return;
-  }
-  if(password.length < 6){ showAlert(el('signupAlert'),'danger','Password must be at least 6 characters.'); return; }
-
-  try {
-    const pw_hash = await sha256hex(password);
-    const payload = { company_name: company, name, surname, phone, password_hash: pw_hash, preferred_payment: payment };
-
-    // Call Hub backend to create customer and send WhatsApp from company's number
-    const resp = await fetch(`${ADMIN_BASE}/api/customer_signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      credentials: 'include'
-    });
-
-    const body = await resp.json().catch(()=>({ ok:false, error: 'Invalid response' }));
-
-    if(resp.ok && body && body.ok){
-      showAlert(el('signupAlert'),'success','Signup successful — you will receive confirmation via WhatsApp shortly.');
-      // show cart link with payment and phone
-      el('cartLink').style.display = 'inline-block';
-      el('cartLink').href = `cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}&pay=${encodeURIComponent(payment)}`;
-    } else {
-      const err = (body && body.error) ? body.error : `Signup failed (${resp.status})`;
-      showAlert(el('signupAlert'),'danger', err);
-    }
-  } catch(e){
-    console.error(e);
-    showAlert(el('signupAlert'),'danger','Network error when signing up.');
-  }
-});
-
-/* Login handler */
-el('btnLogin').addEventListener('click', async ()=>{
-  hide(el('loginAlert'));
-  const phone = el('loginPhone').value.trim();
-  const password = el('loginPassword').value;
-  const company = el('companySelect').value;
-
-  if(!phone || !password || !company){
-    showAlert(el('loginAlert'),'danger','Phone, password and company required.');
-    return;
-  }
-
-  try {
-    const r = await fetch(`${RAW_BASE}/customers.json`, {cache:'no-store'});
-    if(!r.ok) throw new Error('Could not load customers');
-    const customers = (await r.json()).customers || [];
-
-    const match = customers.find(c => (c.company_name === company && c.phone === phone));
-    if(!match){ showAlert(el('loginAlert'),'danger','Customer not found for this company.'); return; }
-
-    const hashed = await sha256hex(password);
-    if(hashed === match.password_hash){
-      showAlert(el('loginAlert'),'success','Login OK. Redirecting to cart...');
-      // include possible stored preferred_payment or allow customer choose on cart
-      const pay = match.preferred_payment || 'cash';
-      setTimeout(()=> window.location.href = `cart.html?company=${encodeURIComponent(company)}&phone=${encodeURIComponent(phone)}&pay=${encodeURIComponent(pay)}`, 600);
-    } else {
-      showAlert(el('loginAlert'),'danger','Invalid credentials.');
-    }
-  } catch(e){
-    console.error(e);
-    showAlert(el('loginAlert'),'danger','Network error during login.');
-  }
-});
-
-/* refresh companies button */
-el('refreshCompanies').addEventListener('click', loadClients);
-
-/* initial load */
-window.addEventListener('DOMContentLoaded', loadClients);
-</script>
+    document.getElementById('btnLogout').onclick = () => window.location.reload();
+    loadCompanies();
+  </script>
 </body>
 </html>
+
 
 
 
