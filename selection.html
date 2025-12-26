@@ -7,40 +7,62 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background: #022c22; color: #fff; }
-    .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #0f172a; }
+    .header-sage { background: #059669; }
+    .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(5, 150, 105, 0.1); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
+    .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .product-card:active { transform: scale(0.95); background: #ecfdf5; }
+    .cart-anim { animation: slideIn 0.5s forwards; }
+    @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   </style>
 </head>
-<body class="min-h-screen flex flex-col p-4">
-    <header class="flex justify-between items-center py-6 px-4 shrink-0">
-        <div>
-            <h1 id="salonName" class="text-xl font-black uppercase tracking-tight">Salon Menu</h1>
-            <p class="text-emerald-500/50 text-[9px] font-bold uppercase tracking-widest">Mobile Catalog</p>
+<body class="min-h-screen flex flex-col bg-[#f0fdf4]">
+    
+    <!-- Header -->
+    <header class="header-sage pt-12 pb-8 px-6 text-white rounded-b-[3rem] shadow-xl shrink-0">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 id="salonName" class="text-2xl font-black uppercase tracking-tight">Salon Menu</h1>
+                <p id="userNameDisplay" class="text-emerald-100 text-[10px] font-bold uppercase tracking-widest mt-1">Guest Selection</p>
+            </div>
+            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-black text-emerald-950 shadow-lg">I</div>
         </div>
-        <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-emerald-950">I</div>
     </header>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar space-y-6 pb-40">
+    <!-- Catalog -->
+    <main class="flex-1 overflow-y-auto no-scrollbar px-6 py-10 space-y-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-black text-emerald-900 uppercase text-xs tracking-widest">Available Treatments</h3>
+            <span class="text-[9px] font-bold text-emerald-500 bg-white px-3 py-1 rounded-full border border-emerald-50 uppercase">Synced Live</span>
+        </div>
         <div id="catalogGrid" class="grid grid-cols-2 gap-4">
-            <div class="col-span-2 py-20 text-center opacity-20">
-                <p class="text-xs font-bold uppercase tracking-widest">Fetching Salon Inventory...</p>
+            <!-- Items Injected -->
+            <div class="col-span-2 text-center py-20 opacity-20">
+                <p class="text-xs font-bold uppercase tracking-widest">Loading Catalog...</p>
             </div>
         </div>
+        <div class="h-32"></div> <!-- Spacer for cart -->
     </main>
 
-    <div id="cartBar" class="fixed bottom-10 left-4 right-4 glass rounded-[2.5rem] p-6 shadow-2xl flex items-center justify-between transform translate-y-40 transition-transform duration-500">
+    <!-- Floating Checkout Bar -->
+    <div id="cartBar" class="fixed bottom-10 left-6 right-6 glass rounded-[2.5rem] p-6 shadow-2xl flex items-center justify-between hidden cart-anim border-2 border-white">
         <div>
             <p id="cartCount" class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">0 Items Selected</p>
-            <p id="cartTotal" class="text-2xl font-black text-white">R0.00</p>
+            <p id="cartTotal" class="text-3xl font-black text-emerald-950">R0.00</p>
         </div>
-        <button id="btnCheckout" class="bg-emerald-500 text-emerald-950 px-8 py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all">
-            Send to Counter
+        <button id="btnPush" class="bg-emerald-950 text-white px-8 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-xl active:scale-95 transition-all">
+            Join Queue
         </button>
     </div>
 
     <script>
-        const RAW_BASE = 'https://raw.githubusercontent.com/maliq273/IsaacsPos/main';
+        const GITHUB_TOKEN = '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';
+        const GITHUB_OWNER = 'maliq273';
+        const GITHUB_REPO = 'IsaacsPos';
+        const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`;
+        const API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
+
         const params = new URLSearchParams(window.location.search);
         const mid = params.get('ref');
         const phone = params.get('phone');
@@ -50,46 +72,102 @@
         let cart = [];
 
         async function init() {
-            const rInfo = await fetch(`${RAW_BASE}/company_info.json`);
-            const salons = await rInfo.json();
-            const salon = salons.find(s => s.machine_id === mid);
-            if (salon) document.getElementById('salonName').textContent = salon.company;
+            document.getElementById('userNameDisplay').textContent = cname ? cname.toUpperCase() : 'GUEST';
+            
+            try {
+                // 1. Get Salon Name
+                const salons = await (await fetch(`${RAW_BASE}/company_info.json`)).json();
+                const salon = salons.find(s => s.machine_id === mid);
+                if (salon) document.getElementById('salonName').textContent = salon.company;
 
-            const rProd = await fetch(`${RAW_BASE}/data/products.json?t=${Date.now()}`);
-            const prodData = await rProd.json();
-            products = prodData.products || [];
-            renderCatalog();
+                // 2. Load Inventory
+                const pData = await (await fetch(`${RAW_BASE}/data/products.json?t=${Date.now()}`)).json();
+                products = pData.products || [];
+                renderCatalog();
+            } catch (e) {
+                alert("Error connecting to Salon Cloud.");
+            }
         }
 
         function renderCatalog() {
             const grid = document.getElementById('catalogGrid');
-            grid.innerHTML = products.map(p => `
-                <div onclick="addToCart(${p.id})" class="glass rounded-3xl p-5 flex flex-col justify-between h-40 active:scale-95 transition-all cursor-pointer">
+            grid.innerHTML = products.length ? products.map(p => `
+                <div onclick="addToCart(${p.id})" class="bg-white rounded-[2rem] p-5 flex flex-col justify-between h-44 shadow-sm border border-emerald-50 product-card cursor-pointer">
                     <div>
-                        <span class="text-[8px] font-black text-emerald-500 uppercase tracking-widest">${p.category}</span>
-                        <h3 class="font-bold text-[11px] leading-tight mt-1 line-clamp-2">${p.name}</h3>
+                        <span class="text-[8px] font-black text-emerald-400 uppercase tracking-widest">${p.category}</span>
+                        <h3 class="font-black text-emerald-950 text-xs leading-tight mt-1 line-clamp-2">${p.name}</h3>
                     </div>
                     <div class="flex justify-between items-end">
-                        <span class="font-black text-lg">R${p.price.toFixed(0)}</span>
-                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 font-black">+</div>
+                        <span class="font-black text-xl text-emerald-900">R${p.price.toFixed(0)}</span>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 text-2xl font-black">+</div>
                     </div>
                 </div>
-            `).join('') || '<p class="col-span-2 text-center opacity-30 py-10 uppercase text-[10px] font-black">Menu Unavailable</p>';
+            `).join('') : '<p class="col-span-2 text-center text-emerald-300 font-black uppercase text-[10px] py-10">No Services Online</p>';
         }
 
         window.addToCart = (id) => {
             const p = products.find(x => x.id === id);
             cart.push(p);
+            
             const bar = document.getElementById('cartBar');
             const total = cart.reduce((s, i) => s + i.price, 0);
-            document.getElementById('cartCount').textContent = `${cart.length} Items Selected`;
+            
+            document.getElementById('cartCount').textContent = `${cart.length} Item${cart.length > 1 ? 's' : ''} Selected`;
             document.getElementById('cartTotal').textContent = `R${total.toFixed(2)}`;
-            bar.classList.remove('translate-y-40');
+            bar.classList.remove('hidden');
         };
 
-        document.getElementById('btnCheckout').onclick = () => {
-            alert(`Thanks ${cname}! Your selection has been pushed to the Cloud Queue. Please approach the stylist.`);
-            window.location.href = "index.html";
+        document.getElementById('btnPush').onclick = async () => {
+            const btn = document.getElementById('btnPush');
+            btn.textContent = "SYNCING...";
+            btn.disabled = true;
+
+            const orderId = Math.random().toString(36).substr(2, 9).toUpperCase();
+            const payload = {
+                id: orderId,
+                customer_name: cname,
+                customer_phone: phone,
+                items: cart.map(i => ({ 
+                    productId: i.id, 
+                    productName: i.name, 
+                    quantity: 1, 
+                    price: i.price, 
+                    subtotal: i.price 
+                })),
+                total: cart.reduce((s, i) => s + i.price, 0),
+                payment_intent: 'CASH',
+                created_at: new Date().toISOString(),
+                source: 'QR'
+            };
+
+            try {
+                // In IsaacsPOS, the POS polls for files in /orders/[mid]/
+                const path = `/contents/orders/${mid}/order_${orderId}.json`;
+                const res = await fetch(`${API_BASE}${path}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: `Mobile Order: ${cname} (${orderId})`,
+                        content: btoa(JSON.stringify(payload, null, 2))
+                    })
+                });
+
+                if (res.ok) {
+                    alert(`Folio successfully pushed to Salon Queue! Please approach the counter to finalize.`);
+                    window.location.href = "index.html";
+                } else {
+                    throw new Error("Push Failed");
+                }
+            } catch (e) {
+                alert("Queue Sync Error. Please show your cart to the stylist.");
+            } finally {
+                btn.textContent = "JOIN QUEUE";
+                btn.disabled = false;
+            }
         };
 
         init();
