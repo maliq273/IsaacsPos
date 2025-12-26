@@ -1,0 +1,20 @@
+{
+  "7ae628998054116b": {
+    "machine_id": "7ae628998054116b",
+    "name": "Isaacs Hair Studio",
+    "email": "info@partners.online",
+    "phone": "27718831097",
+    "address": "53 Gie Street",
+    "token": "190E66D2CEFA45F4",
+    "created_at": "2025-10-07T15:00:05.072859"
+  },
+  "41": {
+    "machine_id": "41",
+    "name": "Mosadie Hair",
+    "email": "",
+    "phone": "",
+    "address": "",
+    "token": null,
+    "created_at": "2024-11-12T09:00:00Z"
+  }
+}
