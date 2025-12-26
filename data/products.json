@@ -1,1 +1,18 @@
-{}
+{
+  "salonName": "Mosadie hair",
+  "machineId": "36230C99EF76",
+  "lastSync": "2025-12-26T13:56:10.872Z",
+  "products": [
+    {
+      "name": "d,tdtu",
+      "price": 200,
+      "id": 1
+    },
+    {
+      "name": "hkjhhgfh",
+      "price": 200,
+      "category": "Service",
+      "id": 2
+    }
+  ]
+}
