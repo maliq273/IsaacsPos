@@ -22,13 +22,13 @@
 <script type="importmap">
 {
   "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "vite": "https://esm.sh/vite@^7.3.0",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
     "path": "https://esm.sh/path@^0.12.7",
     "url": "https://esm.sh/url@^0.11.4",
-    "react": "https://esm.sh/react@^19.2.3",
     "recharts": "https://esm.sh/recharts@^3.6.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "react/": "https://esm.sh/react@^19.2.3/",
     "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
     "electron": "https://esm.sh/electron@^39.2.7",
@@ -76,7 +76,7 @@
 
         <!-- Forms -->
         <div id="formContainer">
-          <!-- Login Form (Email + Phone as Password) -->
+          <!-- Login Form -->
           <div id="loginForm" class="space-y-6">
             <div class="space-y-4">
               <div class="space-y-1">
@@ -150,7 +150,6 @@
 
     let currentUser = null;
 
-    // Correct UTF-8 Base64 Decoding
     function decodeGitHub(content) {
       if (!content) return "";
       try {
@@ -165,7 +164,6 @@
       }
     }
 
-    // Correct UTF-8 Base64 Encoding
     function encodeGitHub(str) {
       const bytes = new TextEncoder().encode(str);
       let binString = "";
@@ -185,6 +183,7 @@
         },
         body: body ? JSON.stringify(body) : null
       });
+      if (response.status === 404 && method === 'GET') return null;
       return response.json();
     }
 
@@ -211,13 +210,14 @@
       const select = document.getElementById('salonSelect');
       try {
         const res = await fetch(`${RAW_BASE}/company_info.json?t=${Date.now()}`);
+        if (!res.ok) throw new Error();
         const data = await res.json();
         select.innerHTML = data.filter(s => s.status === 'active').map(s => 
           `<option value="${s.machine_id}">${s.company.toUpperCase()}</option>`
         ).join('');
         const ref = new URLSearchParams(window.location.search).get('ref');
         if (ref) select.value = ref;
-      } catch (e) { select.innerHTML = '<option>Cloud Pending...</option>'; }
+      } catch (e) { select.innerHTML = '<option>Cloud Handshake Pending...</option>'; }
     }
 
     document.getElementById('btnLogin').onclick = async () => {
@@ -230,15 +230,15 @@
 
       try {
         const res = await fetch(`${RAW_BASE}/customers.json?t=${Date.now()}`);
+        if (!res.ok) throw new Error("Could not find customer database.");
         const data = await res.json();
-        // Match Email (Username) and Phone (Password)
         const user = data.customers.find(c => c.email.toLowerCase() === email && c.phone === phone);
         if (user) {
           showDashboard(user);
         } else {
           alert("Invalid credentials. Please join the club if you are new!");
         }
-      } catch (e) { alert("Cloud Verification Failed."); }
+      } catch (e) { alert("Cloud Verification Failed: " + e.message); }
       finally {
         document.getElementById('loginSpinner').classList.add('hidden');
         document.getElementById('loginBtnText').classList.remove('hidden');
@@ -258,8 +258,16 @@
 
       try {
         const file = await ghRequest('/contents/customers.json');
-        const content = JSON.parse(decodeGitHub(file.content));
         
+        let content = { customers: [] };
+        let sha = null;
+
+        if (file && file.content) {
+            const decoded = decodeGitHub(file.content);
+            if (decoded) content = JSON.parse(decoded);
+            sha = file.sha;
+        }
+
         if (content.customers.some(c => c.email.toLowerCase() === email)) {
           alert("This email is already registered. Please sign in.");
           tabs.login.click();
@@ -279,16 +287,21 @@
         content.customers.push(newUser);
         
         const updateRes = await ghRequest('/contents/customers.json', 'PUT', {
-          message: `Reg: ${newUser.name}`,
+          message: `Member Registered: ${newUser.name}`,
           content: encodeGitHub(JSON.stringify(content, null, 2)),
-          sha: file.sha
+          sha: sha
         });
 
-        if (updateRes.content) {
+        if (updateRes && updateRes.content) {
           alert("Success! Welcome to the family.");
           showDashboard(newUser);
+        } else {
+            throw new Error("GitHub rejected update.");
         }
-      } catch (e) { alert("Signup Error: " + e.message); }
+      } catch (e) { 
+          console.error(e);
+          alert("Signup Error: " + e.message); 
+      }
       finally {
         document.getElementById('signupSpinner').classList.add('hidden');
         document.getElementById('signupBtnText').classList.remove('hidden');
@@ -321,6 +334,7 @@
   </script>
 </body>
 </html>
+
 
 
 
