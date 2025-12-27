@@ -58,7 +58,6 @@
         const GITHUB_OWNER = 'maliq273';
         const GITHUB_REPO = 'IsaacsPos';
         const API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
-        const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`;
 
         const params = new URLSearchParams(window.location.search);
         const mid = params.get('ref');
@@ -69,6 +68,13 @@
         let products = [];
         let cart = [];
 
+        function decodeGitHub(content) {
+          const bin = atob(content.replace(/\s/g, ''));
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+          return new TextDecoder().decode(bytes);
+        }
+
         function encodeGitHub(str) {
             const bytes = new TextEncoder().encode(str);
             let bin = "";
@@ -76,17 +82,39 @@
             return btoa(bin);
         }
 
+        async function ghApi(path, method = 'GET', body = null) {
+            const res = await fetch(`${API_BASE}${path}`, {
+                method,
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                body: body ? JSON.stringify(body) : null
+            });
+            return res.status === 404 ? null : res.json();
+        }
+
         async function init() {
             document.getElementById('userNameDisplay').textContent = cname ? cname.toUpperCase() : 'GUEST';
             try {
-                const salons = await (await fetch(`${RAW_BASE}/company_info.json?t=${Date.now()}`)).json();
-                const salon = salons.find(s => s.machine_id === mid);
-                if (salon) document.getElementById('salonName').textContent = salon.company;
+                // Fetch latest Salon info
+                const sFile = await ghApi('/contents/company_info.json');
+                if (sFile) {
+                    const salons = JSON.parse(decodeGitHub(sFile.content));
+                    const salon = salons.find(s => s.machine_id === mid);
+                    if (salon) document.getElementById('salonName').textContent = salon.company;
+                }
 
-                const pData = await (await fetch(`${RAW_BASE}/data/products.json?t=${Date.now()}`)).json();
-                products = pData.products || [];
-                renderCatalog();
-            } catch (e) { console.error("Sync Error", e); }
+                // Fetch latest Products
+                const pFile = await ghApi('/contents/data/products.json');
+                if (pFile) {
+                    const pData = JSON.parse(decodeGitHub(pFile.content));
+                    products = pData.products || [];
+                    renderCatalog();
+                }
+            } catch (e) { console.error("API Sync Failed", e); }
         }
 
         function renderCatalog() {
@@ -102,7 +130,7 @@
                         <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 text-2xl font-black">+</div>
                     </div>
                 </div>
-            `).join('') : '<p class="col-span-2 text-center text-slate-300 font-black uppercase text-[10px] py-20">Catalog empty</p>';
+            `).join('') : '<p class="col-span-2 text-center text-slate-300 font-black uppercase text-[10px] py-20">No active treatments found</p>';
         }
 
         window.addToCart = (id) => {
@@ -141,28 +169,19 @@
 
             try {
                 const path = `/contents/orders/${mid}/order_${orderId}.json`;
-                const res = await fetch(`${API_BASE}${path}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Accept': 'application/vnd.github.v3+json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: `Mobile Queue: ${cname}`,
-                        content: encodeGitHub(JSON.stringify(payload, null, 2))
-                    })
+                const res = await ghApi(path, 'PUT', {
+                    message: `Queue Order: ${cname}`,
+                    content: encodeGitHub(JSON.stringify(payload, null, 2))
                 });
 
-                if (res.ok) {
-                    alert(`Success! Your selection is in the queue. Please visit the counter to finalize.`);
+                if (res && res.content) {
+                    alert(`Success! Selection queued. See counter to finalize.`);
                     window.location.href = "index.html";
                 } else {
-                    const err = await res.json();
-                    throw new Error(err.message || "Push failed");
+                    throw new Error("Push rejected");
                 }
             } catch (e) {
-                alert("Queue Error: " + e.message);
+                alert("Queue Error: " + (e.message || "Cloud unavailable"));
             } finally {
                 btn.textContent = "CHECKOUT";
                 btn.disabled = false;
