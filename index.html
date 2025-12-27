@@ -108,10 +108,12 @@
   </div>
 
   <script>
+    // Note: If this token is revoked by GitHub, writes (signup) will fail.
     const GITHUB_TOKEN = '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';
     const GITHUB_OWNER = 'maliq273';
     const GITHUB_REPO = 'IsaacsPos';
-    const API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
+    const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`;
+    const API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
 
     function encodeGitHub(str) {
       const bytes = new TextEncoder().encode(str);
@@ -122,54 +124,54 @@
       return btoa(binString);
     }
 
-    function decodeGitHub(content) {
-      if (!content) return "";
-      try {
-        const binString = atob(content.replace(/\s/g, ''));
-        const bytes = new Uint8Array(binString.length);
-        for (let i = 0; i < binString.length; i++) {
-          bytes[i] = binString.charCodeAt(i);
-        }
-        return new TextDecoder().decode(bytes);
-      } catch (e) {
-        throw new Error("Decode Error: " + e.message);
-      }
+    // Standard Reading (No Token Required)
+    async function ghRead(path) {
+      const response = await fetch(`${RAW_URL}/${path}?t=${Date.now()}`, {
+        cache: 'no-store'
+      });
+      if (!response.ok) return null;
+      return await response.json();
     }
 
-    async function ghApi(path, method = 'GET', body = null) {
-      const response = await fetch(`${API_BASE}${path}`, {
+    // Standard Writing (Token Required)
+    async function ghWrite(path, method, body) {
+      const response = await fetch(`${API_URL}/contents/${path}`, {
         method,
         headers: {
-          'Authorization': `token ${GITHUB_TOKEN}`,
+          'Authorization': `Bearer ${GITHUB_TOKEN}`,
           'Accept': 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
+          'Content-Type': 'application/json'
         },
-        body: body ? JSON.stringify(body) : null
+        body: JSON.stringify(body)
       });
-      if (response.status === 404 && method === 'GET') return null;
-      const data = await response.json();
-      if (!response.ok) throw { status: response.status, message: data.message };
-      return data;
+      
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || `API ${response.status}`);
+      }
+      return await response.json();
     }
 
     function getEmailSlug(email) {
-        return email.trim().toLowerCase().replace(/[^a-z0-9]/gi, '_');
+      return email.trim().toLowerCase().replace(/[^a-z0-9]/gi, '_');
     }
 
     async function loadSalons() {
       const select = document.getElementById('salonSelect');
       try {
-        // We use the contents API for company info to avoid RAW cache
-        const file = await ghApi('/contents/company_info.json');
-        if (!file) return;
-        const data = JSON.parse(decodeGitHub(file.content));
+        const data = await ghRead('company_info.json');
+        if (!data) {
+           select.innerHTML = '<option>Handshake Required</option>';
+           return;
+        }
         select.innerHTML = data.filter(s => s.status === 'active').map(s => 
           `<option value="${s.machine_id}">${s.company.toUpperCase()}</option>`
         ).join('');
         const ref = new URLSearchParams(window.location.search).get('ref');
         if (ref) select.value = ref;
-      } catch (e) { select.innerHTML = '<option>Syncing...</option>'; }
+      } catch (e) { 
+        select.innerHTML = '<option>Connection Offline</option>'; 
+      }
     }
 
     function redirectToMenu(user) {
@@ -188,22 +190,20 @@
 
       try {
         const slug = getEmailSlug(email);
-        const file = await ghApi(`/contents/data/customers/${slug}.json`);
+        const user = await ghRead(`data/customers/${slug}.json`);
         
-        if (!file) {
-            // Fallback to legacy check if file doesn't exist? 
-            // Better to just alert they need to sign up if we are migrating.
-            throw new Error("Member profile not found. Please join the club!");
+        if (!user) {
+          throw new Error("Profile not found. Please join the club!");
         }
 
-        const user = JSON.parse(decodeGitHub(file.content));
         if (user.phone === phone) {
-            redirectToMenu(user);
+          redirectToMenu(user);
         } else {
-            alert("Incorrect cellphone number.");
+          alert("Incorrect cellphone number.");
         }
-      } catch (e) { alert(e.message || "Login failed."); }
-      finally {
+      } catch (e) { 
+        alert(e.message || "Login failed."); 
+      } finally {
         document.getElementById('loginSpinner').classList.add('hidden');
         document.getElementById('loginBtnText').classList.remove('hidden');
       }
@@ -223,15 +223,15 @@
       try {
         const slug = getEmailSlug(email);
         
-        // 1. Check if user already exists (unique file check)
-        const check = await ghApi(`/contents/data/customers/${slug}.json`);
+        // 1. Check existence via public read
+        const check = await ghRead(`data/customers/${slug}.json`);
         if (check) {
-            alert("Email already registered. Signing you in...");
-            tabs.login.click();
-            return;
+          alert("Email already registered. Signing you in...");
+          tabs.login.click();
+          return;
         }
 
-        // 2. Create individual member file
+        // 2. Prepare user
         const newUser = { 
           name: `${fn} ${sn}`, 
           email: email, 
@@ -243,19 +243,18 @@
         };
 
         const updateBody = {
-          message: `Reg Member: ${newUser.name}`,
+          message: `Join: ${newUser.name}`,
           content: encodeGitHub(JSON.stringify(newUser, null, 2))
         };
 
-        // Create the file. Since it's a new path, no SHA is needed. NO CONFLICTS POSSIBLE.
-        await ghApi(`/contents/data/customers/${slug}.json`, 'PUT', updateBody);
+        // 3. Write via API
+        await ghWrite(`data/customers/${slug}.json`, 'PUT', updateBody);
         
-        alert("Registration Successful!");
+        alert("Success! Welcome to the club.");
         redirectToMenu(newUser);
       } catch (e) { 
-        alert("Signup Error: " + (e.message || "Service error")); 
-      }
-      finally {
+        alert("Signup Error: " + (e.message || "Network Timeout")); 
+      } finally {
         document.getElementById('signupSpinner').classList.add('hidden');
         document.getElementById('signupBtnText').classList.remove('hidden');
       }
@@ -282,6 +281,7 @@
   </script>
 </body>
 </html>
+
 
 
 
