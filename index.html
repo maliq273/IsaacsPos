@@ -69,7 +69,6 @@
         </div>
 
         <div id="formContainer">
-          <!-- Login -->
           <div id="loginForm" class="space-y-6">
             <div class="space-y-4">
               <div class="space-y-1">
@@ -87,7 +86,6 @@
             </button>
           </div>
 
-          <!-- Signup -->
           <div id="signupForm" class="hidden space-y-4 animate-in fade-in slide-in-from-bottom-4">
             <div class="grid grid-cols-2 gap-4">
               <input id="firstName" placeholder="FIRST NAME" class="w-full p-5 input-field text-xs uppercase">
@@ -114,9 +112,7 @@
     const GITHUB_OWNER = 'maliq273';
     const GITHUB_REPO = 'IsaacsPos';
     const API_BASE = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
-    const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`;
 
-    // Robust UTF-8 Encoding for GitHub
     function encodeGitHub(str) {
       const bytes = new TextEncoder().encode(str);
       let binString = "";
@@ -126,7 +122,6 @@
       return btoa(binString);
     }
 
-    // Robust UTF-8 Decoding for GitHub
     function decodeGitHub(content) {
       if (!content) return "";
       try {
@@ -137,11 +132,11 @@
         }
         return new TextDecoder().decode(bytes);
       } catch (e) {
-        throw new Error("Decoding Error: " + e.message);
+        throw new Error("Decode Error: " + e.message);
       }
     }
 
-    async function ghRequest(path, method = 'GET', body = null) {
+    async function ghApi(path, method = 'GET', body = null) {
       const response = await fetch(`${API_BASE}${path}`, {
         method,
         headers: {
@@ -152,57 +147,62 @@
         },
         body: body ? JSON.stringify(body) : null
       });
-      
       if (response.status === 404 && method === 'GET') return null;
-      
       const data = await response.json();
-      if (!response.ok) {
-        // Log detailed error for debugging
-        console.error("GitHub API Error Details:", data);
-        throw new Error(data.message || `API Error ${response.status}`);
-      }
+      if (!response.ok) throw { status: response.status, message: data.message };
       return data;
+    }
+
+    function getEmailSlug(email) {
+        return email.trim().toLowerCase().replace(/[^a-z0-9]/gi, '_');
     }
 
     async function loadSalons() {
       const select = document.getElementById('salonSelect');
       try {
-        const res = await fetch(`${RAW_BASE}/company_info.json?t=${Date.now()}`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
+        // We use the contents API for company info to avoid RAW cache
+        const file = await ghApi('/contents/company_info.json');
+        if (!file) return;
+        const data = JSON.parse(decodeGitHub(file.content));
         select.innerHTML = data.filter(s => s.status === 'active').map(s => 
           `<option value="${s.machine_id}">${s.company.toUpperCase()}</option>`
         ).join('');
         const ref = new URLSearchParams(window.location.search).get('ref');
         if (ref) select.value = ref;
-      } catch (e) { select.innerHTML = '<option>Cloud Handshake Pending...</option>'; }
+      } catch (e) { select.innerHTML = '<option>Syncing...</option>'; }
     }
 
     function redirectToMenu(user) {
       const mid = document.getElementById('salonSelect').value;
-      if (!mid) return alert("Please select a salon location first.");
+      if (!mid) return alert("Select location.");
       window.location.href = `selection.html?ref=${mid}&phone=${user.phone}&email=${encodeURIComponent(user.email)}&name=${encodeURIComponent(user.name)}`;
     }
 
     document.getElementById('btnLogin').onclick = async () => {
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const phone = document.getElementById('loginPhone').value.trim();
-      if (!email || !phone) return alert("Email and Cellphone required.");
+      if (!email || !phone) return alert("Details required.");
       
       document.getElementById('loginSpinner').classList.remove('hidden');
       document.getElementById('loginBtnText').classList.add('hidden');
 
       try {
-        const res = await fetch(`${RAW_BASE}/customers.json?t=${Date.now()}`);
-        if (!res.ok) throw new Error("Database not reachable.");
-        const data = await res.json();
-        const user = data.customers.find(c => c.email.toLowerCase() === email && c.phone === phone);
-        if (user) {
-          redirectToMenu(user);
-        } else {
-          alert("Invalid credentials. Please join the club if you are new!");
+        const slug = getEmailSlug(email);
+        const file = await ghApi(`/contents/data/customers/${slug}.json`);
+        
+        if (!file) {
+            // Fallback to legacy check if file doesn't exist? 
+            // Better to just alert they need to sign up if we are migrating.
+            throw new Error("Member profile not found. Please join the club!");
         }
-      } catch (e) { alert("Auth Failed: " + e.message); }
+
+        const user = JSON.parse(decodeGitHub(file.content));
+        if (user.phone === phone) {
+            redirectToMenu(user);
+        } else {
+            alert("Incorrect cellphone number.");
+        }
+      } catch (e) { alert(e.message || "Login failed."); }
       finally {
         document.getElementById('loginSpinner').classList.add('hidden');
         document.getElementById('loginBtnText').classList.remove('hidden');
@@ -215,32 +215,23 @@
       const email = document.getElementById('signupEmail').value.trim().toLowerCase();
       const phone = document.getElementById('signupPhone').value.trim();
 
-      if (!fn || !sn || !email || phone.length < 10) return alert("Please complete all fields.");
+      if (!fn || !sn || !email || phone.length < 10) return alert("Complete all details.");
 
       document.getElementById('signupSpinner').classList.remove('hidden');
       document.getElementById('signupBtnText').classList.add('hidden');
 
       try {
-        // 1. Fetch the latest file content AND the absolute latest SHA from API
-        const fileData = await ghRequest('/contents/customers.json');
+        const slug = getEmailSlug(email);
         
-        let content = { customers: [] };
-        let sha = null;
-
-        if (fileData) {
-          const decoded = decodeGitHub(fileData.content);
-          content = JSON.parse(decoded);
-          sha = fileData.sha; // THIS SHA IS CRITICAL
+        // 1. Check if user already exists (unique file check)
+        const check = await ghApi(`/contents/data/customers/${slug}.json`);
+        if (check) {
+            alert("Email already registered. Signing you in...");
+            tabs.login.click();
+            return;
         }
 
-        // 2. Validation
-        if (content.customers.some(c => c.email.toLowerCase() === email)) {
-          alert("Email already registered. Please sign in.");
-          tabs.login.click();
-          return;
-        }
-
-        // 3. Prepare new user
+        // 2. Create individual member file
         const newUser = { 
           name: `${fn} ${sn}`, 
           email: email, 
@@ -250,24 +241,19 @@
           visits: 0, 
           created_at: new Date().toISOString()
         };
-        content.customers.push(newUser);
-        
-        // 4. Update file back to GitHub
-        const updateBody = {
-          message: `Reg: ${newUser.name}`,
-          content: encodeGitHub(JSON.stringify(content, null, 2))
-        };
-        if (sha) updateBody.sha = sha;
 
-        const updateRes = await ghRequest('/contents/customers.json', 'PUT', updateBody);
+        const updateBody = {
+          message: `Reg Member: ${newUser.name}`,
+          content: encodeGitHub(JSON.stringify(newUser, null, 2))
+        };
+
+        // Create the file. Since it's a new path, no SHA is needed. NO CONFLICTS POSSIBLE.
+        await ghApi(`/contents/data/customers/${slug}.json`, 'PUT', updateBody);
         
-        if (updateRes.content) {
-          alert("Account Created! Redirecting to menu...");
-          redirectToMenu(newUser);
-        }
+        alert("Registration Successful!");
+        redirectToMenu(newUser);
       } catch (e) { 
-        console.error("Signup Transaction Error:", e);
-        alert("Signup Failed: " + e.message); 
+        alert("Signup Error: " + (e.message || "Service error")); 
       }
       finally {
         document.getElementById('signupSpinner').classList.add('hidden');
@@ -296,6 +282,7 @@
   </script>
 </body>
 </html>
+
 
 
 
