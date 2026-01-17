@@ -1,12 +1,25 @@
 [
   {
+    "machine_id": "6ABA8D3E08EB",
+    "company": "Salon Test ",
+    "phone": "27845456682",
+    "address": "Cape Town South Africa",
+    "status": "active",
+    "token": "ISAACS-009BE946",
+    "system_type": "IsaacsPOS",
+    "email": "Maaliek@test.com",
+    "created_at": "2026-01-17T14:20:13.464Z"
+  },
+  {
     "machine_id": "7ae628998054116b",
     "company": "Isaacs Hair Studio",
     "phone": "27718831097",
     "address": "53 Gie Street",
     "status": "active",
     "token": "ISAACS-164CF1A7",
-    "system_type": "IsaacsPOS"
+    "system_type": "IsaacsPOS",
+    "email": "",
+    "created_at": "2026-01-17T14:18:46.611Z"
   },
   {
     "machine_id": "41",
@@ -15,7 +28,9 @@
     "address": "",
     "status": "inactive",
     "token": null,
-    "system_type": "IsaacsPOS"
+    "system_type": "IsaacsPOS",
+    "email": "",
+    "created_at": "2026-01-17T14:18:46.612Z"
   },
   {
     "machine_id": "36230C99EF76",
@@ -24,6 +39,8 @@
     "address": "Gie Road, Tableview",
     "status": "active",
     "token": "ISAACS-336B9C74",
-    "system_type": "IsaacsPOS"
+    "system_type": "IsaacsPOS",
+    "email": "",
+    "created_at": "2026-01-17T14:18:46.612Z"
   }
 ]
