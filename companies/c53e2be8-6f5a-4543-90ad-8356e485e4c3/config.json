@@ -3,6 +3,12 @@
   "company_name": "motas",
   "tier": "Multi-Branch",
   "supabase_enabled": true,
-  "owner_token": null,
-  "branches": []
+  "owner_token": "ISAACS-EC7EF87D",
+  "branches": [
+    {
+      "id": "a5789af7-2e23-4530-9778-5b2a536c5a98",
+      "name": "MOsadie ",
+      "token": null
+    }
+  ]
 }
