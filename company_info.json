@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "machine_id": "a5789af7",
+    "company": "motas",
+    "branch": "MOsadie ",
+    "phone": "",
+    "address": "13",
+    "status": "active",
+    "token": null,
+    "token_generated_at": null,
+    "system_type": "IsaacsPOS",
+    "company_id": "c53e2be8-6f5a-4543-90ad-8356e485e4c3",
+    "tier": "Multi-Branch"
+  }
+]
