@@ -1,0 +1,14 @@
+{
+  "company_id": "191807b0-9b2d-4665-8a8f-369ce4657b72",
+  "company_name": "IsaacsPOS",
+  "tier": "Enterprise",
+  "supabase_enabled": true,
+  "owner_token": null,
+  "branches": [
+    {
+      "id": "093110de-55f3-4790-9a90-41aa15fc9708",
+      "name": "Main Branch",
+      "token": null
+    }
+  ]
+}
