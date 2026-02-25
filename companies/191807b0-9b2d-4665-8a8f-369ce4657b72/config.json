@@ -1,14 +1,26 @@
 {
+  "id": "191807b0-9b2d-4665-8a8f-369ce4657b72",
   "company_id": "191807b0-9b2d-4665-8a8f-369ce4657b72",
   "company_name": "IsaacsPOS",
+  "owner_name": "Maaliek",
   "tier": "Enterprise",
+  "status": "active",
+  "created_at": "2026-02-21T11:25:48.281953+00:00",
   "supabase_enabled": true,
-  "owner_token": null,
+  "owner_token": "ISAACS-A7E7CD3F",
+  "owner_token_generated_at": "2026-02-22T17:08:09.831+00:00",
+  "branch_tokens": "",
   "branches": [
     {
       "id": "093110de-55f3-4790-9a90-41aa15fc9708",
+      "company_id": "191807b0-9b2d-4665-8a8f-369ce4657b72",
       "name": "Main Branch",
-      "token": null
+      "location": "",
+      "status": "active",
+      "system_type": "IsaacsPOS",
+      "token": null,
+      "token_generated_at": null,
+      "created_at": "2026-02-21T11:25:49.320978+00:00"
     }
   ]
 }
