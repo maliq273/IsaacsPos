@@ -3,26 +3,32 @@
     "machine_id": "a5789af7",
     "company": "motas",
     "branch": "MOsadie ",
-    "phone": "",
+    "phone": null,
     "address": "13",
     "status": "active",
     "token": "ISAACS-DA0C013C",
     "token_generated_at": "2026-02-17T16:32:06.668+00:00",
     "system_type": "IsaacsPOS",
     "company_id": "c53e2be8-6f5a-4543-90ad-8356e485e4c3",
-    "tier": "Multi-Branch"
+    "internal_id": "c53e2be8-6f5a-4543-90ad-8356e485e4c3",
+    "tier": "Multi-Branch",
+    "owner_name": null,
+    "created_at": "2026-02-16T12:56:05.131945+00:00"
   },
   {
     "machine_id": "093110de",
     "company": "IsaacsPOS",
     "branch": "Main Branch",
-    "phone": "",
+    "phone": "+27718831097",
     "address": "",
     "status": "active",
     "token": null,
     "token_generated_at": null,
     "system_type": "IsaacsPOS",
     "company_id": "191807b0-9b2d-4665-8a8f-369ce4657b72",
-    "tier": "Enterprise"
+    "internal_id": "191807b0-9b2d-4665-8a8f-369ce4657b72",
+    "tier": "Enterprise",
+    "owner_name": "Maaliek",
+    "created_at": "2026-02-21T11:25:49.320978+00:00"
   }
 ]
