@@ -1,14 +1,26 @@
 {
-  "company_id": "c53e2be8-6f5a-4543-90ad-8356e485e4c3",
+  "id": "c53e2be8-6f5a-4543-90ad-8356e485e4c3",
+  "company_id": null,
   "company_name": "motas",
+  "owner_name": null,
   "tier": "Multi-Branch",
+  "status": "active",
+  "created_at": "2026-02-16T12:52:28.19593+00:00",
   "supabase_enabled": true,
   "owner_token": "ISAACS-EC7EF87D",
+  "owner_token_generated_at": "2026-02-16T12:53:02.206+00:00",
+  "branch_tokens": "ISAACS-DA0C013C",
   "branches": [
     {
       "id": "a5789af7-2e23-4530-9778-5b2a536c5a98",
+      "company_id": "c53e2be8-6f5a-4543-90ad-8356e485e4c3",
       "name": "MOsadie ",
-      "token": "ISAACS-DA0C013C"
+      "location": "13",
+      "status": "active",
+      "system_type": "IsaacsPOS",
+      "token": "ISAACS-DA0C013C",
+      "token_generated_at": "2026-02-17T16:32:06.668+00:00",
+      "created_at": "2026-02-16T12:56:05.131945+00:00"
     }
   ]
 }
