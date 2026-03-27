@@ -9,7 +9,7 @@
   "supabase_enabled": true,
   "owner_token": "ISAACS-A7E7CD3F",
   "owner_token_generated_at": "2026-02-22T17:08:09.831+00:00",
-  "branch_tokens": "",
+  "branch_tokens": "ISAACS-4D480EEE",
   "branches": [
     {
       "id": "093110de-55f3-4790-9a90-41aa15fc9708",
@@ -18,8 +18,8 @@
       "location": "",
       "status": "active",
       "system_type": "IsaacsPOS",
-      "token": null,
-      "token_generated_at": null,
+      "token": "ISAACS-4D480EEE",
+      "token_generated_at": "2026-02-27T10:41:20.2+00:00",
       "created_at": "2026-02-21T11:25:49.320978+00:00"
     }
   ]
