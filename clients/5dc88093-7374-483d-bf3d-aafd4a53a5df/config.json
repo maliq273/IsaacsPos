@@ -1,0 +1,25 @@
+{
+  "id": "5dc88093-7374-483d-bf3d-aafd4a53a5df",
+  "company_id": "5dc88093-7374-483d-bf3d-aafd4a53a5df",
+  "company_name": "Mosadie",
+  "owner_name": "Maaliek",
+  "tier": "Multi-Branch",
+  "status": "active",
+  "created_at": "2026-05-05T14:37:27.052243+00:00",
+  "supabase_enabled": true,
+  "owner_token": "M07251986",
+  "access_code": null,
+  "hr_payroll_token": null,
+  "owner_token_generated_at": null,
+  "branch_tokens": "",
+  "branches": [
+    {
+      "id": "00000000-0000-4000-a000-000000000000",
+      "company_id": "5dc88093-7374-483d-bf3d-aafd4a53a5df",
+      "name": "Default Branch",
+      "location": "Unknown",
+      "status": "active",
+      "created_at": "2026-04-30T12:10:18.296279+00:00"
+    }
+  ]
+}
